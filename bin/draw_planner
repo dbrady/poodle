@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 require 'prawn'
 require 'time'
+require 'date'
 require 'ruby-debug'
 
 module Prawn
@@ -8,6 +9,13 @@ module Prawn
     alias :opacity :transparent
   end
 end
+
+# get date of current week (or ARGV[0])
+start_date = ARGV[0] || Date.today
+
+# now backdate to Monday (wday=0-6 with 0=Sunday)
+delta = start_date.wday - 1
+start_date += delta
 
 Prawn::Document.generate "planner_sheet.pdf", page_layout: :landscape do
   # ======================================================================
@@ -54,8 +62,7 @@ Prawn::Document.generate "planner_sheet.pdf", page_layout: :landscape do
   # ----------------------------------------------------------------------
 
   # calculate dates for this planner
-  start_date = Time.parse("2012-01-30")
-  end_date = start_date + 6 * 86400
+  end_date = start_date + 6
   label = start_date.strftime("%b %-d - ")
   label += end_date.strftime("%b ") if end_date.month != start_date.month
   label += end_date.strftime("%-d, %Y")
@@ -82,7 +89,7 @@ Prawn::Document.generate "planner_sheet.pdf", page_layout: :landscape do
   font_size = old_font_size
 
   # Draw day labels, e.g. "Mon 1/30", "Tue 1/31", "Wed 2/1" etc.
-  days = (0..6).map {|d| (start_date + (d*86400)).strftime("%a   %-m/%-d")}
+  days = (0..6).map {|d| (start_date + d).strftime("%a   %-m/%-d")}
 
   (0..7).each do |i|
     next if i.zero?
