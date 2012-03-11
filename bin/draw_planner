@@ -16,7 +16,8 @@ start_date = ARGV[0] ? Date.parse(ARGV[0]) : Date.today
 
 # now backdate to Monday (wday=0-6 with 0=Sunday)
 delta = start_date.wday - 1
-start_date += delta
+delta += 7 if delta < 0 # Sundays will advance the date by default
+start_date -= delta
 
 Prawn::Document.generate "planner_sheet.pdf", page_layout: :landscape do
   # ======================================================================
