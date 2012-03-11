@@ -5,7 +5,7 @@ def execute_draw_planner(date, filename)
 end
 
 def execute_delete_planner(filename)
-  system "rm #{filename}"
+  system "rm -f #{filename}"
 end
 
 def get_md5_for_planner(filename)
@@ -17,6 +17,7 @@ describe "Draw Planner (BLACK BOX API)" do
     before do
       @date = "2012-03-11"
       @planner_filename = "spec_planner_sheet.pdf"
+      execute_delete_planner @planner_filename
       execute_draw_planner @date, @planner_filename
     end
 

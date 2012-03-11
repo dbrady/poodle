@@ -1,5 +1,4 @@
-require "poodle/version"
+require 'prawn'
+require_relative "prawn_patches"
+require_relative "planner"
 
-module Poodle
-  # Your code goes here...
-end
