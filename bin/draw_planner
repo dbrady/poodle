@@ -2,6 +2,7 @@
 require 'prawn'
 require 'time'
 require 'date'
+require 'trollop'
 require 'ruby-debug'
 
 module Prawn
@@ -11,15 +12,21 @@ module Prawn
   end
 end
 
+opts = Trollop.options do
+  opt :date, "Start date of planner (planner will start on the Monday of the week that includes that date)", :type => :string, :default => nil
+  opt :output, "Output filename", :type => :string, :default => 'planner_sheet.pdf'
+end
+
 # get date of current week (or ARGV[0])
-start_date = ARGV[0] ? Date.parse(ARGV[0]) : Date.today
+start_date = opts[:date] ? Date.parse(opts[:date]) : Date.today
+filename = opts[:output]
 
 # now backdate to Monday (wday=0-6 with 0=Sunday)
 delta = start_date.wday - 1
 delta += 7 if delta < 0 # Sundays will advance the date by default
 start_date -= delta
 
-Prawn::Document.generate "planner_sheet.pdf", page_layout: :landscape do
+Prawn::Document.generate filename, page_layout: :landscape do
   # ======================================================================
   # Front Page
 
