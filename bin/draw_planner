@@ -6,12 +6,13 @@ require 'ruby-debug'
 
 module Prawn
   class Document
+    # fix POLS violation in Prawn; ideally should also rewrite transparent(t) to call transparent_orig(1.0-t)
     alias :opacity :transparent
   end
 end
 
 # get date of current week (or ARGV[0])
-start_date = ARGV[0] || Date.today
+start_date = ARGV[0] ? Date.parse(ARGV[0]) : Date.today
 
 # now backdate to Monday (wday=0-6 with 0=Sunday)
 delta = start_date.wday - 1
@@ -132,4 +133,3 @@ Prawn::Document.generate "planner_sheet.pdf", page_layout: :landscape do
     stroke_line [0,y], [720,y]
   end
 end
-
