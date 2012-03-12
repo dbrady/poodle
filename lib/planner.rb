@@ -1,10 +1,25 @@
 class Planner
   def self.draw(start_date, filename)
     start_date = self.rewind_to_monday start_date
-
     pdf = generate_planner_pdf start_date
+    save_pdf pdf, filename
+  end
 
-    File.open(filename, 'w').write(pdf.render)
+  def self.save_pdf(pdf, filename)
+    open_file(filename, 'w') do |file|
+      file.write pdf.render
+    end
+  end
+
+  # This is just a wrapper to File.open so we can test this class
+  # without stubbing File.open itself (which other programs in the
+  # testing ecosystem are using). A later refactoring could make this
+  # filename -> file conversion explicit, and eliminate the need for a
+  # stub altogether.
+  def self.open_file(filename, mode, &block)
+    File.open(filename, mode) do |file|
+      yield file
+    end
   end
 
   # Returns first Monday on or before start_date

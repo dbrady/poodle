@@ -26,7 +26,7 @@ describe "Draw Planner (BLACK BOX API)" do
     end
 
 
-    it "should have correct md5 checksum" do
+    it "has the correct md5 checksum" do
       get_md5_for_planner(@planner_filename).should == "772e21f0b42db4f59caaeaaa2e95f6ac"
     end
   end
