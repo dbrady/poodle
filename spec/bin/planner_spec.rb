@@ -31,7 +31,7 @@ describe Planner do
       buffer = StringIO.new
       Planner.should_receive(:open_file).with(@planner_filename, "w").and_yield(buffer)
       Planner.draw @date, @planner_filename
-      md5(buffer.string).should == "772e21f0b42db4f59caaeaaa2e95f6ac"
+      md5(buffer.string).should == "b2bf5c67cc7ee16ba88c311bcc227856"
     end
   end
 end
