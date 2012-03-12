@@ -1,11 +1,13 @@
 require_relative '../spec_helper'
 
 describe Planner do
-  describe ".munge_start_date" do
+  describe ".rewind_to_monday" do
     it "rewinds date to previous Monday" do
-      Planner.munge_start_date(Date.parse('2012-03-15')).should == Date.parse('2012-03-12')
+      Planner.rewind_to_monday(Date.parse('2012-03-15')).should == Date.parse('2012-03-12')
     end
 
-    it "does not rewind if given date is a Monday"
+    it "does not rewind if given date is a Monday" do
+      Planner.rewind_to_monday(Date.parse('2012-03-12')).should == Date.parse('2012-03-12')
+    end
   end
 end

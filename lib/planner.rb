@@ -1,14 +1,14 @@
 class Planner
   def self.draw(start_date, filename)
-    # now backdate to Monday (wday=0-6 with 0=Sunday)
-    start_date = self.munge_start_date start_date
+    start_date = self.rewind_to_monday start_date
 
     pdf = generate_planner_pdf start_date
 
     File.open(filename, 'w').write(pdf.render)
   end
 
-  def self.munge_start_date(start_date)
+  # Returns first Monday on or before start_date
+  def self.rewind_to_monday(start_date)
     delta = start_date.wday - 1
     delta += 7 if delta < 0 # Sundays will advance the date by default
     start_date -= delta
