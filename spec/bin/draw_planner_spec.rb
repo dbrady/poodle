@@ -1,7 +1,7 @@
 require_relative "../spec_helper"
 
 def execute_draw_planner(date, filename)
-  system "bin/draw_planner -d #{date} -o #{filename}"
+  Planner.draw(Date.parse(@date), @planner_filename)
 end
 
 def execute_delete_planner(filename)
