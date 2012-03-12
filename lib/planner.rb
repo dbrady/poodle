@@ -123,8 +123,7 @@ class Planner
       (START_HOUR..END_HOUR).each do |hour|
         # This is SO nasty. It sets how far down the page the hour labels start counting.
         y = (BODY_HEIGHT+TIME_SLOT_HEIGHT)-hour*HOUR_HEIGHT
-        [1,4].each do |column|
-          x = column * COLUMN_WIDTH
+        [1,4].map {|column| column * COLUMN_WIDTH }.each do |x|
           label = (hour%12).to_s
           label = "12" if label == "0"
           bounding_box [x,y], width: CHECK_COLUMN_WIDTH, height: HOUR_HEIGHT do
