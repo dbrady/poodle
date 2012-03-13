@@ -159,8 +159,6 @@ class Planner
 
       start_new_page
 
-      # TODO: Remove magic numbers
-      # TODO: Convert loops
       # lightweight graph
       line_width THIN_LINE_WIDTH
 
@@ -176,13 +174,11 @@ class Planner
 
       # bounds
       line_width THICK_LINE_WIDTH
-      0.upto(GRAPH_MAJOR_COLUMNS) do |i|
-        x = i * PAGE_WIDTH/GRAPH_MAJOR_COLUMNS
+      0.upto(GRAPH_MAJOR_COLUMNS).map { |i| i * PAGE_WIDTH/GRAPH_MAJOR_COLUMNS }.each do |x|
         stroke_line [x,0], [x,PAGE_HEIGHT]
       end
 
-      0.upto(GRAPH_MAJOR_ROWS) do |i|
-        y = i * PAGE_HEIGHT/GRAPH_MAJOR_ROWS
+      0.upto(GRAPH_MAJOR_ROWS).map {|i| i * PAGE_HEIGHT/GRAPH_MAJOR_ROWS }.each do |y|
         stroke_line [0,y], [PAGE_WIDTH,y]
       end
     end
