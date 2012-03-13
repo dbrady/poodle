@@ -14,6 +14,7 @@ class Planner
   THICK_LINE_WIDTH=0.2
   THIN_LINE_WIDTH=0.1
   LIGHT_LINE_OPACITY=0.75
+  HOURLY_LABEL_FONT_SIZE=8
 
   # Some useful derived constants
   BODY_HEIGHT=PAGE_HEIGHT-HEADER_HEIGHT
@@ -75,6 +76,19 @@ class Planner
     end
   end
 
+  # Returns a label for the week starting on start_date, e.g. "Mar 5 -
+  # 11, 2012". If the week spans a month, both month abbreviations are
+  # included, e.g. "Mar 26 - Apr 1, 2012". The year is NOT duplicated
+  # if it is spanned, mostly because it's very rare and the expansion
+  # looks as weird as the unexpanded version. So the correct output
+  # for Dec 26, 2011 would be e.g. "Dec 26 - Jan 1, 2012"
+  def self.date_label_for_week(start_date)
+      end_date = start_date + DAYS_PER_WEEK-1
+      label = start_date.strftime("%b %-d - ")
+      label += end_date.strftime("%b ") if end_date.month != start_date.month
+      label += end_date.strftime("%-d, %Y")
+  end
+
   def self.generate_planner_pdf(start_date)
     # TODO: switch to pass-in-object mode
     pdf = Prawn::Document.new page_layout: :landscape do
@@ -115,15 +129,9 @@ class Planner
       # Draw labels
       # ----------------------------------------------------------------------
 
-      # calculate dates for this planner
-      # TODO: EXTRACT AND TEST ME, DAVID
-      # TODO: OR YOUR LIFE IS FORFEIT AND RANDY WILL MAKE HIS POO FACE
-      end_date = start_date + DAYS_PER_WEEK-1
-      label = start_date.strftime("%b %-d - ")
-      label += end_date.strftime("%b ") if end_date.month != start_date.month
-      label += end_date.strftime("%-d, %Y")
-
       # Draw main title label, e.g "Jan 30-Feb 5, 2012
+      label = Planner.date_label_for_week start_date
+
       bounding_box [TITLE_X, TITLE_Y], width: TITLE_LABEL_WIDTH, height: TITLE_LABEL_HEIGHT do
         stroke_bounds
         text_box label, width: TITLE_LABEL_WIDTH, height: TITLE_LABEL_HEIGHT, align: :center, valign: :center, style: :bold
@@ -131,7 +139,7 @@ class Planner
 
       # Draw hourly column label 8, 9, 10, etc in Monday and Thursday columns
       old_font_size = font_size
-      font_size 8
+      font_size HOURLY_LABEL_FONT_SIZE
       (START_HOUR..END_HOUR).each do |hour|
         # This is SO nasty. It sets how far down the page the hour
         # labels start counting--which was chosen arbitrarily.
@@ -149,7 +157,6 @@ class Planner
       # Draw day labels, e.g. "Mon 1/30", "Tue 1/31", "Wed 2/1" etc.
       day_labels = (0...DAYS_PER_WEEK).map {|d| (start_date + d).strftime("%a   %-m/%-d")}
 
-      # TODO: Gratuitous complexity much?
       day_labels.map.with_index {|label, i| [label, (TODO_COLUMNS+i)*COLUMN_WIDTH]}.each do |label, x|
         text_box label, at: [x,PAGE_HEIGHT], height: HEADER_HEIGHT, width: COLUMN_WIDTH, align: :center, valign: :center, style: :bold
       end
