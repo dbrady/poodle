@@ -176,12 +176,12 @@ class Planner
 
       # bounds
       line_width THICK_LINE_WIDTH
-      (0..GRAPH_MAJOR_COLUMNS).each do |i|
+      0.upto(GRAPH_MAJOR_COLUMNS) do |i|
         x = i * PAGE_WIDTH/GRAPH_MAJOR_COLUMNS
         stroke_line [x,0], [x,PAGE_HEIGHT]
       end
 
-      (0..GRAPH_MAJOR_ROWS).each do |i|
+      0.upto(GRAPH_MAJOR_ROWS) do |i|
         y = i * PAGE_HEIGHT/GRAPH_MAJOR_ROWS
         stroke_line [0,y], [PAGE_WIDTH,y]
       end
