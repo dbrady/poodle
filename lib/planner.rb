@@ -90,7 +90,6 @@ class Planner
   end
 
   def self.generate_planner_pdf(start_date)
-    # TODO: switch to pass-in-object mode
     Prawn::Document.new page_layout: :landscape do |pdf|
       # ======================================================================
       # Front Page
