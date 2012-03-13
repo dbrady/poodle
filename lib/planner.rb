@@ -1,4 +1,44 @@
 class Planner
+  # Prawn-specific page layout units
+  PAGE_WIDTH=720
+  PAGE_HEIGHT=540
+  TIME_SLOT_HEIGHT=9
+  HEADER_HEIGHT=18
+  CHECK_COLUMN_WIDTH=9
+  TITLE_LABEL_WIDTH=140
+  TITLE_LABEL_HEIGHT=18
+  TITLE_X=510
+  TITLE_Y=PAGE_HEIGHT+TITLE_LABEL_HEIGHT+4
+
+  # Prawn-specific appearance characteristics
+  THICK_LINE_WIDTH=0.2
+  THIN_LINE_WIDTH=0.1
+  LIGHT_LINE_OPACITY=0.75
+
+  # Some useful derived constants
+  BODY_HEIGHT=PAGE_HEIGHT-HEADER_HEIGHT
+  ROWS=BODY_HEIGHT/TIME_SLOT_HEIGHT
+
+  # Total number of columns=8, but one is for TODO's
+  DAYS_PER_WEEK=7
+  TODO_COLUMNS=1
+  # This is it--the number of columns on the front side of the planner
+  COLUMNS=TODO_COLUMNS+DAYS_PER_WEEK
+  COLUMN_WIDTH=PAGE_WIDTH/COLUMNS
+
+  # Hour labels are marked on the planner
+  START_HOUR=8
+  END_HOUR=20
+
+  # Right now time slots are 30 minutes
+  HOUR_HEIGHT=TIME_SLOT_HEIGHT*2
+
+  # The back page has 4x2 large sections, each filled with graph paper
+  GRAPH_MAJOR_COLUMNS=4
+  GRAPH_MAJOR_ROWS=2
+  GRAPH_CELL_HEIGHT=9
+  GRAPH_CELL_WIDTH=9
+
   def self.draw(start_date, filename)
     start_date = self.rewind_to_monday start_date
     pdf = generate_planner_pdf start_date
@@ -29,35 +69,6 @@ class Planner
     start_date -= delta
   end
 
-  PAGE_WIDTH=720
-  PAGE_HEIGHT=540
-  TIME_SLOT_HEIGHT=9
-  HEADER_HEIGHT=18
-  CHECK_COLUMN_WIDTH=9
-  GRID_HEIGHT=9
-  GRID_WIDTH=9
-  TITLE_LABEL_WIDTH=140
-  TITLE_LABEL_HEIGHT=18
-  TITLE_X=510
-  TITLE_Y=PAGE_HEIGHT+TITLE_LABEL_HEIGHT+4
-
-  BODY_HEIGHT=PAGE_HEIGHT-HEADER_HEIGHT
-
-  ROWS=BODY_HEIGHT/TIME_SLOT_HEIGHT
-  DAYS_PER_WEEK=7
-  TODO_COLUMNS=1
-  COLUMNS=TODO_COLUMNS+DAYS_PER_WEEK
-  COLUMN_WIDTH=PAGE_WIDTH/COLUMNS
-
-  THICK_LINE_WIDTH=0.2
-  THIN_LINE_WIDTH=0.1
-  LIGHT_LINE_OPACITY=0.75
-
-  START_HOUR=8
-  END_HOUR=20
-
-  HOUR_HEIGHT=TIME_SLOT_HEIGHT*2
-
   def self.check_column_positions(&block)
     (0...PAGE_WIDTH).step(COLUMN_WIDTH) do |i|
       yield CHECK_COLUMN_WIDTH + i
@@ -65,6 +76,7 @@ class Planner
   end
 
   def self.generate_planner_pdf(start_date)
+    # TODO: switch to pass-in-object mode
     pdf = Prawn::Document.new page_layout: :landscape do
       # ======================================================================
       # Front Page
@@ -121,7 +133,8 @@ class Planner
       old_font_size = font_size
       font_size 8
       (START_HOUR..END_HOUR).each do |hour|
-        # This is SO nasty. It sets how far down the page the hour labels start counting.
+        # This is SO nasty. It sets how far down the page the hour
+        # labels start counting--which was chosen arbitrarily.
         y = (BODY_HEIGHT+TIME_SLOT_HEIGHT)-hour*HOUR_HEIGHT
         [1,4].map {|column| column * COLUMN_WIDTH }.each do |x|
           label = (hour%12).to_s
@@ -134,13 +147,11 @@ class Planner
       font_size = old_font_size
 
       # Draw day labels, e.g. "Mon 1/30", "Tue 1/31", "Wed 2/1" etc.
-      days = (0...DAYS_PER_WEEK).map {|d| (start_date + d).strftime("%a   %-m/%-d")}
+      day_labels = (0...DAYS_PER_WEEK).map {|d| (start_date + d).strftime("%a   %-m/%-d")}
 
-      (0..DAYS_PER_WEEK).each do |i|
-        next if i.zero?
-        x = i * COLUMN_WIDTH
-        y = PAGE_HEIGHT
-        text_box days[i-1], at: [x,y], height: HEADER_HEIGHT, width: COLUMN_WIDTH, align: :center, valign: :center, style: :bold
+      # TODO: Gratuitous complexity much?
+      day_labels.map.with_index {|label, i| [label, (TODO_COLUMNS+i)*COLUMN_WIDTH]}.each do |label, x|
+        text_box label, at: [x,PAGE_HEIGHT], height: HEADER_HEIGHT, width: COLUMN_WIDTH, align: :center, valign: :center, style: :bold
       end
 
       # ======================================================================
@@ -148,32 +159,30 @@ class Planner
 
       start_new_page
 
+      # TODO: Remove magic numbers
+      # TODO: Convert loops
       # lightweight graph
       line_width THIN_LINE_WIDTH
 
       opacity LIGHT_LINE_OPACITY do
-        x = 0
-        while x <= PAGE_WIDTH
+        (0..PAGE_WIDTH).step(GRAPH_CELL_WIDTH) do |x|
           stroke_line [x,0], [x,PAGE_HEIGHT]
-          x += GRID_WIDTH
         end
 
-        y = 0
-        while y <= PAGE_HEIGHT
+        (0..PAGE_HEIGHT).step(GRAPH_CELL_HEIGHT) do |y|
           stroke_line [0,y], [PAGE_WIDTH,y]
-          y += GRID_HEIGHT
         end
       end
 
       # bounds
       line_width THICK_LINE_WIDTH
-      (0..4).each do |i|
-        x = i * PAGE_WIDTH/4.0
+      (0..GRAPH_MAJOR_COLUMNS).each do |i|
+        x = i * PAGE_WIDTH/GRAPH_MAJOR_COLUMNS
         stroke_line [x,0], [x,PAGE_HEIGHT]
       end
 
-      (0..2).each do |i|
-        y = i * PAGE_HEIGHT/2.0
+      (0..GRAPH_MAJOR_ROWS).each do |i|
+        y = i * PAGE_HEIGHT/GRAPH_MAJOR_ROWS
         stroke_line [0,y], [PAGE_WIDTH,y]
       end
     end
