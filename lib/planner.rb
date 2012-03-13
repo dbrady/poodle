@@ -29,86 +29,118 @@ class Planner
     start_date -= delta
   end
 
+  PAGE_WIDTH=720
+  PAGE_HEIGHT=540
+  TIME_SLOT_HEIGHT=9
+  HEADER_HEIGHT=18
+  CHECK_COLUMN_WIDTH=9
+  GRID_HEIGHT=9
+  GRID_WIDTH=9
+  TITLE_LABEL_WIDTH=140
+  TITLE_LABEL_HEIGHT=18
+  TITLE_X=510
+  TITLE_Y=PAGE_HEIGHT+TITLE_LABEL_HEIGHT+4
+
+  BODY_HEIGHT=PAGE_HEIGHT-HEADER_HEIGHT
+
+  ROWS=BODY_HEIGHT/TIME_SLOT_HEIGHT
+  DAYS_PER_WEEK=7
+  TODO_COLUMNS=1
+  COLUMNS=TODO_COLUMNS+DAYS_PER_WEEK
+  COLUMN_WIDTH=PAGE_WIDTH/COLUMNS
+
+  THICK_LINE_WIDTH=0.2
+  THIN_LINE_WIDTH=0.1
+  LIGHT_LINE_OPACITY=0.75
+
+  START_HOUR=8
+  END_HOUR=20
+
+  HOUR_HEIGHT=TIME_SLOT_HEIGHT*2
+
+  def self.check_column_positions(&block)
+    (0...PAGE_WIDTH).step(COLUMN_WIDTH) do |i|
+      yield CHECK_COLUMN_WIDTH + i
+    end
+  end
+
   def self.generate_planner_pdf(start_date)
     pdf = Prawn::Document.new page_layout: :landscape do
       # ======================================================================
       # Front Page
 
       # draw light horz lines--half-hour increments plus to-do list items
-      line_width 0.1
-
-      opacity 0.75 do
-        y = 531
-        while y > 0
-          y-=9
-          stroke_line [0,y], [720,y]
+      line_width THIN_LINE_WIDTH
+      opacity LIGHT_LINE_OPACITY do
+        (0..BODY_HEIGHT).step(TIME_SLOT_HEIGHT) do |y|
+          stroke_line [0,y], [PAGE_WIDTH,y]
         end
       end
-
-      line_width 0.2
 
       # ----------------------------------------------------------------------
       # Draw day boxes and outline
       # ----------------------------------------------------------------------
       # vertical lines at edges and between days
-      (0..8).each do |i|
-        x = i * (720/8.0)
-        stroke_line [x,0], [x,540]
+      line_width THICK_LINE_WIDTH
+      (0..PAGE_WIDTH).step(COLUMN_WIDTH) do |x|
+        stroke_line [x,0], [x,PAGE_HEIGHT]
       end
 
       # vertical lines inside day lines for ticking of to-dos
-      line_width 0.1
-      (0..7).each do |i|
-        x = 9 + i * (720/8.0)
-        stroke_line [x,0], [x,522]
+      line_width THIN_LINE_WIDTH
+      Planner.check_column_positions do |x|
+        stroke_line [x,0], [x,BODY_HEIGHT]
       end
-      line_width 0.2
 
       # horizontal lines across top and bottom
-      [0,540].each do |y|
-        stroke_line [0,y], [720,y]
+      line_width THICK_LINE_WIDTH
+      [0,PAGE_HEIGHT].each do |y|
+        stroke_line [0,y], [PAGE_WIDTH,y]
       end
-      stroke_line [90,522], [720,522]
+      stroke_line [COLUMN_WIDTH,BODY_HEIGHT], [PAGE_WIDTH,BODY_HEIGHT]
 
       # ----------------------------------------------------------------------
       # Draw labels
       # ----------------------------------------------------------------------
 
       # calculate dates for this planner
-      end_date = start_date + 6
+      # TODO: EXTRACT AND TEST ME, DAVID
+      # TODO: OR YOUR LIFE IS FORFEIT AND RANDY WILL MAKE HIS POO FACE
+      end_date = start_date + DAYS_PER_WEEK-1
       label = start_date.strftime("%b %-d - ")
       label += end_date.strftime("%b ") if end_date.month != start_date.month
       label += end_date.strftime("%-d, %Y")
 
       # Draw main title label, e.g "Jan 30-Feb 5, 2012
-      bounding_box [510, 562], width: 140, height: 18 do
+      bounding_box [TITLE_X, TITLE_Y], width: TITLE_LABEL_WIDTH, height: TITLE_LABEL_HEIGHT do
         stroke_bounds
-        text_box label, width: 140, height: 18, align: :center, valign: :center, style: :bold
+        text_box label, width: TITLE_LABEL_WIDTH, height: TITLE_LABEL_HEIGHT, align: :center, valign: :center, style: :bold
       end
 
       # Draw hourly column label 8, 9, 10, etc in Monday and Thursday columns
       old_font_size = font_size
       font_size 8
-      (8..20).each do |hour|
-        [720/8.0, 4*(720/8.0)].each do |x|
-          y = 531-18*hour
+      (START_HOUR..END_HOUR).each do |hour|
+        # This is SO nasty. It sets how far down the page the hour labels start counting.
+        y = (BODY_HEIGHT+TIME_SLOT_HEIGHT)-hour*HOUR_HEIGHT
+        [1,4].map {|column| column * COLUMN_WIDTH }.each do |x|
           label = (hour%12).to_s
           label = "12" if label == "0"
-          bounding_box [x,y], width: 9, height: 18 do
-            text_box label, width: 9, height: 18, align: :right, valign: :center
+          bounding_box [x,y], width: CHECK_COLUMN_WIDTH, height: HOUR_HEIGHT do
+            text_box label, width: CHECK_COLUMN_WIDTH, height: HOUR_HEIGHT, align: :right, valign: :center
           end
         end
       end
       font_size = old_font_size
 
       # Draw day labels, e.g. "Mon 1/30", "Tue 1/31", "Wed 2/1" etc.
-      days = (0..6).map {|d| (start_date + d).strftime("%a   %-m/%-d")}
+      days = (0...DAYS_PER_WEEK).map {|d| (start_date + d).strftime("%a   %-m/%-d")}
 
-      (0..7).each do |i|
+      (0..DAYS_PER_WEEK).each do |i|
         next if i.zero?
-        x = i * 720/8.0
-        y = 540
-        text_box days[i-1], at: [x,y], height: 18, width: 90, align: :center, valign: :center, style: :bold
+        x = i * COLUMN_WIDTH
+        y = PAGE_HEIGHT
+        text_box days[i-1], at: [x,y], height: HEADER_HEIGHT, width: COLUMN_WIDTH, align: :center, valign: :center, style: :bold
       end
 
       # ======================================================================
@@ -117,32 +149,32 @@ class Planner
       start_new_page
 
       # lightweight graph
-      line_width 0.1
+      line_width THIN_LINE_WIDTH
 
-      opacity 0.75 do
+      opacity LIGHT_LINE_OPACITY do
         x = 0
-        while x <= 720
-          stroke_line [x,0], [x,540]
-          x += 9
+        while x <= PAGE_WIDTH
+          stroke_line [x,0], [x,PAGE_HEIGHT]
+          x += GRID_WIDTH
         end
 
         y = 0
-        while y <= 540
-          stroke_line [0,y], [720,y]
-          y += 9
+        while y <= PAGE_HEIGHT
+          stroke_line [0,y], [PAGE_WIDTH,y]
+          y += GRID_HEIGHT
         end
       end
 
       # bounds
-      line_width 0.2
+      line_width THICK_LINE_WIDTH
       (0..4).each do |i|
-        x = i * 720/4.0
-        stroke_line [x,0], [x,540]
+        x = i * PAGE_WIDTH/4.0
+        stroke_line [x,0], [x,PAGE_HEIGHT]
       end
 
       (0..2).each do |i|
-        y = i * 540/2.0
-        stroke_line [0,y], [720,y]
+        y = i * PAGE_HEIGHT/2.0
+        stroke_line [0,y], [PAGE_WIDTH,y]
       end
     end
   end
