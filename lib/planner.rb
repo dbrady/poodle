@@ -91,15 +91,15 @@ class Planner
 
   def self.generate_planner_pdf(start_date)
     # TODO: switch to pass-in-object mode
-    pdf = Prawn::Document.new page_layout: :landscape do
+    Prawn::Document.new page_layout: :landscape do |pdf|
       # ======================================================================
       # Front Page
 
       # draw light horz lines--half-hour increments plus to-do list items
-      line_width THIN_LINE_WIDTH
-      opacity LIGHT_LINE_OPACITY do
+      pdf.line_width THIN_LINE_WIDTH
+      pdf.opacity LIGHT_LINE_OPACITY do
         (0..BODY_HEIGHT).step(TIME_SLOT_HEIGHT) do |y|
-          stroke_line [0,y], [PAGE_WIDTH,y]
+          pdf.stroke_line [0,y], [PAGE_WIDTH,y]
         end
       end
 
@@ -107,23 +107,23 @@ class Planner
       # Draw day boxes and outline
       # ----------------------------------------------------------------------
       # vertical lines at edges and between days
-      line_width THICK_LINE_WIDTH
+      pdf.line_width THICK_LINE_WIDTH
       (0..PAGE_WIDTH).step(COLUMN_WIDTH) do |x|
-        stroke_line [x,0], [x,PAGE_HEIGHT]
+        pdf.stroke_line [x,0], [x,PAGE_HEIGHT]
       end
 
       # vertical lines inside day lines for ticking of to-dos
-      line_width THIN_LINE_WIDTH
+      pdf.line_width THIN_LINE_WIDTH
       Planner.check_column_positions do |x|
-        stroke_line [x,0], [x,BODY_HEIGHT]
+        pdf.stroke_line [x,0], [x,BODY_HEIGHT]
       end
 
       # horizontal lines across top and bottom
-      line_width THICK_LINE_WIDTH
+      pdf.line_width THICK_LINE_WIDTH
       [0,PAGE_HEIGHT].each do |y|
-        stroke_line [0,y], [PAGE_WIDTH,y]
+        pdf.stroke_line [0,y], [PAGE_WIDTH,y]
       end
-      stroke_line [COLUMN_WIDTH,BODY_HEIGHT], [PAGE_WIDTH,BODY_HEIGHT]
+      pdf.stroke_line [COLUMN_WIDTH,BODY_HEIGHT], [PAGE_WIDTH,BODY_HEIGHT]
 
       # ----------------------------------------------------------------------
       # Draw labels
@@ -132,14 +132,14 @@ class Planner
       # Draw main title label, e.g "Jan 30-Feb 5, 2012
       label = Planner.date_label_for_week start_date
 
-      bounding_box [TITLE_X, TITLE_Y], width: TITLE_LABEL_WIDTH, height: TITLE_LABEL_HEIGHT do
-        stroke_bounds
-        text_box label, width: TITLE_LABEL_WIDTH, height: TITLE_LABEL_HEIGHT, align: :center, valign: :center, style: :bold
+      pdf.bounding_box [TITLE_X, TITLE_Y], width: TITLE_LABEL_WIDTH, height: TITLE_LABEL_HEIGHT do
+        pdf.stroke_bounds
+        pdf.text_box label, width: TITLE_LABEL_WIDTH, height: TITLE_LABEL_HEIGHT, align: :center, valign: :center, style: :bold
       end
 
       # Draw hourly column label 8, 9, 10, etc in Monday and Thursday columns
-      old_font_size = font_size
-      font_size HOURLY_LABEL_FONT_SIZE
+      old_font_size = pdf.font_size
+      pdf.font_size HOURLY_LABEL_FONT_SIZE
       (START_HOUR..END_HOUR).each do |hour|
         # This is SO nasty. It sets how far down the page the hour
         # labels start counting--which was chosen arbitrarily.
@@ -147,46 +147,46 @@ class Planner
         [1,4].map {|column| column * COLUMN_WIDTH }.each do |x|
           label = (hour%12).to_s
           label = "12" if label == "0"
-          bounding_box [x,y], width: CHECK_COLUMN_WIDTH, height: HOUR_HEIGHT do
-            text_box label, width: CHECK_COLUMN_WIDTH, height: HOUR_HEIGHT, align: :right, valign: :center
+          pdf.bounding_box [x,y], width: CHECK_COLUMN_WIDTH, height: HOUR_HEIGHT do
+            pdf.text_box label, width: CHECK_COLUMN_WIDTH, height: HOUR_HEIGHT, align: :right, valign: :center
           end
         end
       end
-      font_size = old_font_size
+      pdf.font_size = old_font_size
 
       # Draw day labels, e.g. "Mon 1/30", "Tue 1/31", "Wed 2/1" etc.
       day_labels = (0...DAYS_PER_WEEK).map {|d| (start_date + d).strftime("%a   %-m/%-d")}
 
       day_labels.map.with_index {|label, i| [label, (TODO_COLUMNS+i)*COLUMN_WIDTH]}.each do |label, x|
-        text_box label, at: [x,PAGE_HEIGHT], height: HEADER_HEIGHT, width: COLUMN_WIDTH, align: :center, valign: :center, style: :bold
+        pdf.text_box label, at: [x,PAGE_HEIGHT], height: HEADER_HEIGHT, width: COLUMN_WIDTH, align: :center, valign: :center, style: :bold
       end
 
       # ======================================================================
       # Back Page
 
-      start_new_page
+      pdf.start_new_page
 
       # lightweight graph
-      line_width THIN_LINE_WIDTH
+      pdf.line_width THIN_LINE_WIDTH
 
-      opacity LIGHT_LINE_OPACITY do
+      pdf.opacity LIGHT_LINE_OPACITY do
         (0..PAGE_WIDTH).step(GRAPH_CELL_WIDTH) do |x|
-          stroke_line [x,0], [x,PAGE_HEIGHT]
+          pdf.stroke_line [x,0], [x,PAGE_HEIGHT]
         end
 
         (0..PAGE_HEIGHT).step(GRAPH_CELL_HEIGHT) do |y|
-          stroke_line [0,y], [PAGE_WIDTH,y]
+          pdf.stroke_line [0,y], [PAGE_WIDTH,y]
         end
       end
 
       # bounds
-      line_width THICK_LINE_WIDTH
+      pdf.line_width THICK_LINE_WIDTH
       0.upto(GRAPH_MAJOR_COLUMNS).map { |i| i * PAGE_WIDTH/GRAPH_MAJOR_COLUMNS }.each do |x|
-        stroke_line [x,0], [x,PAGE_HEIGHT]
+        pdf.stroke_line [x,0], [x,PAGE_HEIGHT]
       end
 
       0.upto(GRAPH_MAJOR_ROWS).map {|i| i * PAGE_HEIGHT/GRAPH_MAJOR_ROWS }.each do |y|
-        stroke_line [0,y], [PAGE_WIDTH,y]
+        pdf.stroke_line [0,y], [PAGE_WIDTH,y]
       end
     end
   end
