@@ -68,12 +68,6 @@ class Planner
     file.write pdf.render
   end
 
-  def checkbox_column_positions(&block)
-    (0...PAGE_WIDTH).step(COLUMN_WIDTH) do |i|
-      yield CHECK_COLUMN_WIDTH + i
-    end
-  end
-
   # Returns a label for the week starting on start_date, e.g. "Mar 5 -
   # 11, 2012". If the week spans a month, both month abbreviations are
   # included, e.g. "Mar 26 - Apr 1, 2012". The year is NOT duplicated
@@ -107,7 +101,7 @@ class Planner
 
     # vertical lines inside day lines for ticking of to-dos
     pdf.line_width THIN_LINE_WIDTH
-    checkbox_column_positions do |x|
+    (0...PAGE_WIDTH).step(COLUMN_WIDTH).map {|i| i + CHECK_COLUMN_WIDTH }.each do |x|
       pdf.stroke_line [x,0], [x,BODY_HEIGHT]
     end
 
