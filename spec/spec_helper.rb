@@ -1,7 +1,7 @@
 require "ruby-debug"
 require_relative '../lib/poodle'
 
-MAGIC_MD5_CHECKSUM="77a10eeca7f747b91f0d2133fe11e30f"
+MAGIC_MD5_CHECKSUM="4b8ec4584fce157d810896ddd4a0f701"
 
 def md5(string)
   digest = Digest::MD5.new

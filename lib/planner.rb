@@ -125,11 +125,9 @@ class Planner
 
   def draw_lines_around_header_and_bottom
     use_thick_pen
-    [0,PAGE_HEIGHT].each do |y|
+    [0,BODY_HEIGHT,PAGE_HEIGHT].each do |y|
       pdf.stroke_line [0,y], [PAGE_WIDTH,y]
     end
-    # TODO: Move this into loop; okay to have thick line all they way across
-    pdf.stroke_line [COLUMN_WIDTH,BODY_HEIGHT], [PAGE_WIDTH,BODY_HEIGHT]
   end
 
   def draw_planner_skeleton
