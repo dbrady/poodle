@@ -57,15 +57,26 @@ class Planner
     write_to file
   end
 
+  def write_to(file)
+    file.write pdf.render
+  end
+
   def generate_pdf
     @pdf = Prawn::Document.new page_layout: :landscape
     generate_front_page
+    pdf.start_new_page
     generate_back_page
     @pdf
   end
 
-  def write_to(file)
-    file.write pdf.render
+  def generate_front_page
+    draw_planner_skeleton
+    draw_labels
+  end
+
+  def generate_back_page
+    draw_graph_paper
+    draw_octant_outlines
   end
 
   def date_label_for_week
@@ -83,52 +94,61 @@ class Planner
     pdf.line_width THIN_LINE_WIDTH
   end
 
-  def generate_front_page
-    # draw light horz lines--half-hour increments plus to-do list items
-    use_thin_pen
+  def with_light_pen(&block)
     pdf.opacity LIGHT_LINE_OPACITY do
+      yield
+    end
+  end
+
+  def draw_time_slots
+    use_thin_pen
+    with_light_pen do
       (0..BODY_HEIGHT).step(TIME_SLOT_HEIGHT) do |y|
         pdf.stroke_line [0,y], [PAGE_WIDTH,y]
       end
     end
+  end
 
-    # ----------------------------------------------------------------------
-    # Draw day boxes and outline
-    # ----------------------------------------------------------------------
-    # vertical lines at edges and between days
+  def draw_columns
     use_thick_pen
     (0..PAGE_WIDTH).step(COLUMN_WIDTH) do |x|
       pdf.stroke_line [x,0], [x,PAGE_HEIGHT]
     end
+  end
 
-    # vertical lines inside day lines for ticking of to-dos
+  def draw_checkoff_columns
     use_thin_pen
     (0...PAGE_WIDTH).step(COLUMN_WIDTH).map {|i| i + CHECK_COLUMN_WIDTH }.each do |x|
       pdf.stroke_line [x,0], [x,BODY_HEIGHT]
     end
+  end
 
-    # horizontal lines across top and bottom
+  def draw_lines_around_header_and_bottom
     use_thick_pen
     [0,PAGE_HEIGHT].each do |y|
       pdf.stroke_line [0,y], [PAGE_WIDTH,y]
     end
+    # TODO: Move this into loop; okay to have thick line all they way across
     pdf.stroke_line [COLUMN_WIDTH,BODY_HEIGHT], [PAGE_WIDTH,BODY_HEIGHT]
+  end
 
-    # ----------------------------------------------------------------------
-    # Draw labels
-    # ----------------------------------------------------------------------
+  def draw_planner_skeleton
+    draw_time_slots
+    draw_columns
+    draw_checkoff_columns
+    draw_lines_around_header_and_bottom
+  end
 
-    # Draw main title label, e.g "Jan 30-Feb 5, 2012
+  def draw_page_title
     label = date_label_for_week
 
     pdf.bounding_box [TITLE_X, TITLE_Y], width: TITLE_LABEL_WIDTH, height: TITLE_LABEL_HEIGHT do
       pdf.stroke_bounds
       pdf.text_box label, width: TITLE_LABEL_WIDTH, height: TITLE_LABEL_HEIGHT, align: :center, valign: :center, style: :bold
     end
+  end
 
-    # Draw hourly column label 8, 9, 10, etc in Monday and Thursday columns
-    old_font_size = pdf.font_size
-    pdf.font_size HOURLY_LABEL_FONT_SIZE
+  def draw_hour_labels
     (START_HOUR..END_HOUR).each do |hour|
       # This is SO nasty. It sets how far down the page the hour
       # labels start counting--which was chosen arbitrarily.
@@ -141,27 +161,39 @@ class Planner
         end
       end
     end
+  end
 
-    # Label the Tasks column
-    pdf.text_box "Tasks", at: [0, PAGE_HEIGHT], height: HEADER_HEIGHT, width: COLUMN_WIDTH, align: :center, valign: :center, style: :bold
+  def draw_task_column_labels
+      pdf.text_box "Tasks", at: [0, PAGE_HEIGHT], height: HEADER_HEIGHT, width: COLUMN_WIDTH, align: :center, valign: :center, style: :bold
+  end
 
-    # Draw day labels, e.g. "Mon 1/30", "Tue 1/31", "Wed 2/1" etc.
+  def draw_day_column_labels
     day_labels = (0...DAYS_PER_WEEK).map {|d| (@start_date + d).strftime("%a   %-m/%-d")}
 
     day_labels.map.with_index {|label, i| [label, (TODO_COLUMNS+i)*COLUMN_WIDTH]}.each do |label, x|
       pdf.text_box label, at: [x,PAGE_HEIGHT], height: HEADER_HEIGHT, width: COLUMN_WIDTH, align: :center, valign: :center, style: :bold
     end
+  end
 
+  def with_font_size(font_size, &block)
+    old_font_size = pdf.font_size
+    pdf.font_size = font_size
+    yield
     pdf.font_size = old_font_size
   end
 
-  def generate_back_page
-    pdf.start_new_page
+  def draw_labels
+    draw_page_title
+    with_font_size(HOURLY_LABEL_FONT_SIZE) do
+      draw_hour_labels
+      draw_task_column_labels
+      draw_day_column_labels
+    end
+  end
 
-    # lightweight graph
+  def draw_graph_paper
     use_thin_pen
-
-    pdf.opacity LIGHT_LINE_OPACITY do
+    with_light_pen do
       (0..PAGE_WIDTH).step(GRAPH_CELL_WIDTH) do |x|
         pdf.stroke_line [x,0], [x,PAGE_HEIGHT]
       end
@@ -170,8 +202,9 @@ class Planner
         pdf.stroke_line [0,y], [PAGE_WIDTH,y]
       end
     end
+  end
 
-    # bounds
+  def draw_octant_outlines
     use_thick_pen
     0.upto(GRAPH_MAJOR_COLUMNS).map { |i| i * PAGE_WIDTH/GRAPH_MAJOR_COLUMNS }.each do |x|
       pdf.stroke_line [x,0], [x,PAGE_HEIGHT]
