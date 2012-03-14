@@ -48,14 +48,16 @@ class Planner
   end
 
   def self.draw(start_date, filename)
-    start_date = self.beginning_of_workweek start_date
-    # pdf = generate_pdf start_date
-    # save_pdf pdf, filename
-
-    planner = Planner.new start_date
+    planner = Planner.new start_date.beginning_of_workweek
     pdf = planner.generate_pdf
     save_pdf pdf, filename
+  end
 
+  def generate_pdf
+    Prawn::Document.new page_layout: :landscape do |pdf|
+      generate_front_page pdf
+      generate_back_page pdf
+    end
   end
 
   def self.save_pdf(pdf, filename)
@@ -73,13 +75,6 @@ class Planner
     File.open(filename, mode) do |file|
       yield file
     end
-  end
-
-  # Returns first Monday on or before start_date
-  def self.beginning_of_workweek(start_date)
-    delta = start_date.wday - 1
-    delta += 7 if delta < 0 # Sundays will advance the date by default
-    start_date -= delta
   end
 
   def check_column_positions(&block)
@@ -101,11 +96,7 @@ class Planner
       label += end_date.strftime("%-d, %Y")
   end
 
-  def generate_pdf
-    Prawn::Document.new page_layout: :landscape do |pdf|
-      # ======================================================================
-      # Front Page
-
+  def generate_front_page(pdf)
       # draw light horz lines--half-hour increments plus to-do list items
       pdf.line_width THIN_LINE_WIDTH
       pdf.opacity LIGHT_LINE_OPACITY do
@@ -171,10 +162,9 @@ class Planner
       day_labels.map.with_index {|label, i| [label, (TODO_COLUMNS+i)*COLUMN_WIDTH]}.each do |label, x|
         pdf.text_box label, at: [x,PAGE_HEIGHT], height: HEADER_HEIGHT, width: COLUMN_WIDTH, align: :center, valign: :center, style: :bold
       end
+  end
 
-      # ======================================================================
-      # Back Page
-
+  def generate_back_page(pdf)
       pdf.start_new_page
 
       # lightweight graph
@@ -199,7 +189,6 @@ class Planner
       0.upto(GRAPH_MAJOR_ROWS).map {|i| i * PAGE_HEIGHT/GRAPH_MAJOR_ROWS }.each do |y|
         pdf.stroke_line [0,y], [PAGE_WIDTH,y]
       end
-    end
   end
 end
 

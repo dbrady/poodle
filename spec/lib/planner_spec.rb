@@ -11,20 +11,6 @@ def md5(string)
 end
 
 describe Planner do
-  describe ".beginning_of_workweek" do
-    it "rewinds date to previous Monday" do
-      Planner.beginning_of_workweek(Date.parse('2012-03-15')).should == Date.parse('2012-03-12')
-    end
-
-    it "does not rewind if given date is a Monday" do
-      Planner.beginning_of_workweek(Date.parse('2012-03-12')).should == Date.parse('2012-03-12')
-    end
-
-    it "rewinds if given date is a Sunday" do
-      Planner.beginning_of_workweek(Date.parse('2012-03-11')).should == Date.parse('2012-03-05')
-    end
-  end
-
   describe ".draw" do
     before do
       @planner_filename = "spec_planner_sheet.pdf"
