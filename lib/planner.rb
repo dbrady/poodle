@@ -1,4 +1,7 @@
 class Planner
+  # TODO: Convert to a proper class that can be instantiated. Right now this is a module.
+  # TODO: Break generate_planner_pdf into front and back pages
+
   # Prawn-specific page layout units
   PAGE_WIDTH=720
   PAGE_HEIGHT=540
