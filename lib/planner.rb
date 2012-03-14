@@ -68,12 +68,6 @@ class Planner
     file.write pdf.render
   end
 
-  # Returns a label for the week starting on start_date, e.g. "Mar 5 -
-  # 11, 2012". If the week spans a month, both month abbreviations are
-  # included, e.g. "Mar 26 - Apr 1, 2012". The year is NOT duplicated
-  # if it is spanned, mostly because it's very rare and the expansion
-  # looks as weird as the unexpanded version. So the correct output
-  # for Dec 26, 2011 would be e.g. "Dec 26 - Jan 1, 2012"
   def date_label_for_week
     end_date = @start_date + DAYS_PER_WEEK-1
     label = @start_date.strftime("%b %-d - ")
