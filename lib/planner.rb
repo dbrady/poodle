@@ -145,7 +145,9 @@ class Planner
         end
       end
     end
-    pdf.font_size = old_font_size
+
+    # Label the Tasks column
+    pdf.text_box "Tasks", at: [0, PAGE_HEIGHT], height: HEADER_HEIGHT, width: COLUMN_WIDTH, align: :center, valign: :center, style: :bold
 
     # Draw day labels, e.g. "Mon 1/30", "Tue 1/31", "Wed 2/1" etc.
     day_labels = (0...DAYS_PER_WEEK).map {|d| (@start_date + d).strftime("%a   %-m/%-d")}
@@ -153,6 +155,8 @@ class Planner
     day_labels.map.with_index {|label, i| [label, (TODO_COLUMNS+i)*COLUMN_WIDTH]}.each do |label, x|
       pdf.text_box label, at: [x,PAGE_HEIGHT], height: HEADER_HEIGHT, width: COLUMN_WIDTH, align: :center, valign: :center, style: :bold
     end
+
+    pdf.font_size = old_font_size
   end
 
   def generate_back_page
