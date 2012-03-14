@@ -75,9 +75,17 @@ class Planner
     label += end_date.strftime("%-d, %Y")
   end
 
+  def use_thick_pen
+    pdf.line_width THICK_LINE_WIDTH
+  end
+
+  def use_thin_pen
+    pdf.line_width THIN_LINE_WIDTH
+  end
+
   def generate_front_page
     # draw light horz lines--half-hour increments plus to-do list items
-    pdf.line_width THIN_LINE_WIDTH
+    use_thin_pen
     pdf.opacity LIGHT_LINE_OPACITY do
       (0..BODY_HEIGHT).step(TIME_SLOT_HEIGHT) do |y|
         pdf.stroke_line [0,y], [PAGE_WIDTH,y]
@@ -88,19 +96,19 @@ class Planner
     # Draw day boxes and outline
     # ----------------------------------------------------------------------
     # vertical lines at edges and between days
-    pdf.line_width THICK_LINE_WIDTH
+    use_thick_pen
     (0..PAGE_WIDTH).step(COLUMN_WIDTH) do |x|
       pdf.stroke_line [x,0], [x,PAGE_HEIGHT]
     end
 
     # vertical lines inside day lines for ticking of to-dos
-    pdf.line_width THIN_LINE_WIDTH
+    use_thin_pen
     (0...PAGE_WIDTH).step(COLUMN_WIDTH).map {|i| i + CHECK_COLUMN_WIDTH }.each do |x|
       pdf.stroke_line [x,0], [x,BODY_HEIGHT]
     end
 
     # horizontal lines across top and bottom
-    pdf.line_width THICK_LINE_WIDTH
+    use_thick_pen
     [0,PAGE_HEIGHT].each do |y|
       pdf.stroke_line [0,y], [PAGE_WIDTH,y]
     end
@@ -151,7 +159,7 @@ class Planner
     pdf.start_new_page
 
     # lightweight graph
-    pdf.line_width THIN_LINE_WIDTH
+    use_thin_pen
 
     pdf.opacity LIGHT_LINE_OPACITY do
       (0..PAGE_WIDTH).step(GRAPH_CELL_WIDTH) do |x|
@@ -164,7 +172,7 @@ class Planner
     end
 
     # bounds
-    pdf.line_width THICK_LINE_WIDTH
+    use_thick_pen
     0.upto(GRAPH_MAJOR_COLUMNS).map { |i| i * PAGE_WIDTH/GRAPH_MAJOR_COLUMNS }.each do |x|
       pdf.stroke_line [x,0], [x,PAGE_HEIGHT]
     end
