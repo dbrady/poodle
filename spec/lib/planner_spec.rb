@@ -11,9 +11,7 @@ describe Planner do
 
     it "creates a PDF with correct MD5 checksum" do
       buffer = StringIO.new
-      planner = Planner.new @date
-      pdf = planner.generate_pdf
-      planner.write_to buffer
+      Planner.new(@date).generate_into(buffer)
       md5(buffer.string).should == MAGIC_MD5_CHECKSUM
     end
   end

@@ -50,9 +50,14 @@ class Planner
   end
 
   def self.draw(start_date, filename)
-    planner = Planner.new start_date
-    planner.generate_pdf
-    planner.save filename
+    File.open(filename, "w") do |file|
+      Planner.new(start_date).generate_into(file)
+    end
+  end
+
+  def generate_into(file)
+    generate_pdf
+    write_to file
   end
 
   def generate_pdf
@@ -60,12 +65,6 @@ class Planner
     generate_front_page
     generate_back_page
     @pdf
-  end
-
-  def save(filename)
-    File.open(filename, "w") do |file|
-      write_to file
-    end
   end
 
   def write_to(file)
