@@ -2,35 +2,22 @@ require 'date'
 require_relative '../spec_helper'
 require 'digest/md5'
 
-def md5(string)
-  digest = Digest::MD5.new
-  string.each_line do |line|
-    digest << line
-  end
-  digest.hexdigest
-end
-
 describe Planner do
-  describe ".draw" do
+  describe ".generate_pdf" do
     before do
       @planner_filename = "spec_planner_sheet.pdf"
       @date = Date.parse '2012-03-11'
     end
 
-    it "writes the PDF with correct MD5 checksum" do
+    it "creates a PDF with correct MD5 checksum" do
       buffer = StringIO.new
-      Planner.should_receive(:open_file).with(@planner_filename, "w").and_yield(buffer)
-      Planner.draw @date, @planner_filename
+      planner = Planner.new @date
+      pdf = planner.generate_pdf
+      planner.write_to buffer
       md5(buffer.string).should == MAGIC_MD5_CHECKSUM
     end
   end
 
-  # Returns a label for the week starting on start_date, e.g. "Mar 5 -
-  # 11, 2012". If the week spans a month, both month abbreviations are
-  # included, e.g. "Mar 26 - Feb 1, 2012". The year is NOT duplicated
-  # if it is spanned, mostly because it's very rare and the expansion
-  # looks as weird as the unexpanded version. So the correct output
-  # for Dec 26, 2011 would be e.g. "Dec 26 - Jan 1, 2012"
   describe ".date_label_for_week" do
     it "returns correct date string for the week" do
       Planner.new(Date.parse("2012-03-12")).date_label_for_week.should == "Mar 12 - 18, 2012"

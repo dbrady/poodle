@@ -43,38 +43,33 @@ class Planner
   GRAPH_CELL_HEIGHT=9
   GRAPH_CELL_WIDTH=9
 
+  attr_reader :pdf
+
   def initialize(start_date)
-    @start_date = start_date
+    @start_date = start_date.beginning_of_workweek
   end
 
   def self.draw(start_date, filename)
-    planner = Planner.new start_date.beginning_of_workweek
-    pdf = planner.generate_pdf
-    save_pdf pdf, filename
+    planner = Planner.new start_date
+    planner.generate_pdf
+    planner.save filename
   end
 
   def generate_pdf
-    Prawn::Document.new page_layout: :landscape do |pdf|
-      generate_front_page pdf
-      generate_back_page pdf
+    @pdf = Prawn::Document.new page_layout: :landscape
+    generate_front_page
+    generate_back_page
+    @pdf
+  end
+
+  def save(filename)
+    File.open(filename, "w") do |file|
+      write_to file
     end
   end
 
-  def self.save_pdf(pdf, filename)
-    open_file(filename, 'w') do |file|
-      file.write pdf.render
-    end
-  end
-
-  # This is just a wrapper to File.open so we can test this class
-  # without stubbing File.open itself (which other programs in the
-  # testing ecosystem are using). A later refactoring could make this
-  # filename -> file conversion explicit, and eliminate the need for a
-  # stub altogether.
-  def self.open_file(filename, mode, &block)
-    File.open(filename, mode) do |file|
-      yield file
-    end
+  def write_to(file)
+    file.write pdf.render
   end
 
   def check_column_positions(&block)
@@ -96,7 +91,7 @@ class Planner
       label += end_date.strftime("%-d, %Y")
   end
 
-  def generate_front_page(pdf)
+  def generate_front_page
       # draw light horz lines--half-hour increments plus to-do list items
       pdf.line_width THIN_LINE_WIDTH
       pdf.opacity LIGHT_LINE_OPACITY do
@@ -164,7 +159,7 @@ class Planner
       end
   end
 
-  def generate_back_page(pdf)
+  def generate_back_page
       pdf.start_new_page
 
       # lightweight graph
