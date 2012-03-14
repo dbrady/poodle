@@ -1,6 +1,6 @@
 class Planner
   # TODO: Convert to a proper class that can be instantiated. Right now this is a module.
-  # TODO: Break generate_planner_pdf into front and back pages
+  # TODO: Break generate_pdf into front and back pages
 
   # Prawn-specific page layout units
   PAGE_WIDTH=720
@@ -49,11 +49,11 @@ class Planner
 
   def self.draw(start_date, filename)
     start_date = self.beginning_of_workweek start_date
-    # pdf = generate_planner_pdf start_date
+    # pdf = generate_pdf start_date
     # save_pdf pdf, filename
 
     planner = Planner.new start_date
-    pdf = planner.generate_planner_pdf
+    pdf = planner.generate_pdf
     save_pdf pdf, filename
 
   end
@@ -101,7 +101,7 @@ class Planner
       label += end_date.strftime("%-d, %Y")
   end
 
-  def generate_planner_pdf
+  def generate_pdf
     Prawn::Document.new page_layout: :landscape do |pdf|
       # ======================================================================
       # Front Page
