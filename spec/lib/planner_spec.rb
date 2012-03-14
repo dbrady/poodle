@@ -19,6 +19,10 @@ describe Planner do
     it "does not rewind if given date is a Monday" do
       Planner.rewind_to_monday(Date.parse('2012-03-12')).should == Date.parse('2012-03-12')
     end
+
+    it "rewinds if given date is a Sunday" do
+      Planner.rewind_to_monday(Date.parse('2012-03-11')).should == Date.parse('2012-03-05')
+    end
   end
 
   describe ".draw" do
