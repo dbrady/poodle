@@ -44,7 +44,7 @@ class Planner
   GRAPH_CELL_WIDTH=9
 
   def self.draw(start_date, filename)
-    start_date = self.rewind_to_monday start_date
+    start_date = self.beginning_of_workweek start_date
     pdf = generate_planner_pdf start_date
     save_pdf pdf, filename
   end
@@ -67,7 +67,7 @@ class Planner
   end
 
   # Returns first Monday on or before start_date
-  def self.rewind_to_monday(start_date)
+  def self.beginning_of_workweek(start_date)
     delta = start_date.wday - 1
     delta += 7 if delta < 0 # Sundays will advance the date by default
     start_date -= delta
