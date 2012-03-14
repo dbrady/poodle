@@ -5,10 +5,10 @@ require_relative '../lib/poodle'
 
 opts = Trollop.options do
   opt :date, "Start date of planner (planner will start on the Monday of the week that includes that date)", :type => :string, :default => nil
-  opt :output, "Output filename", :type => :string, :default => 'planner_sheet.pdf'
+  opt :filename, "Output filename", :type => :string, :default => 'planner_sheet.pdf'
 end
 
 start_date = opts[:date] ? Date.parse(opts[:date]) : Date.today
-filename = opts[:output]
+filename = opts[:filename]
 
-Planner.draw(start_date, filename)
+Planner.create start_date, filename

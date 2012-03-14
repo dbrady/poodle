@@ -49,7 +49,7 @@ class Planner
     @start_date = start_date.beginning_of_workweek
   end
 
-  def self.draw(start_date, filename)
+  def self.create(start_date, filename)
     File.open(filename, "w") do |file|
       Planner.new(start_date).generate_into(file)
     end

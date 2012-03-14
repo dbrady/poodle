@@ -1,7 +1,7 @@
 require_relative "../spec_helper"
 
 def execute_draw_planner(date, filename)
-  Planner.draw(Date.parse(@date), @planner_filename)
+  system "bin/draw_planner -d #{@date} -f #{@planner_filename}"
 end
 
 def execute_delete_planner(filename)
@@ -24,7 +24,6 @@ describe "Draw Planner (BLACK BOX API)" do
     after do
       execute_delete_planner @planner_filename
     end
-
 
     it "has the correct md5 checksum" do
       get_md5_for_planner(@planner_filename).should == MAGIC_MD5_CHECKSUM
