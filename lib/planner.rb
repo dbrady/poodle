@@ -206,11 +206,11 @@ class Planner
 
   def draw_octant_outlines
     use_thick_pen
-    0.upto(GRAPH_MAJOR_COLUMNS).map { |i| i * PAGE_WIDTH/GRAPH_MAJOR_COLUMNS }.each do |x|
+    (0..PAGE_WIDTH).step(PAGE_WIDTH/GRAPH_MAJOR_COLUMNS).each do |x|
       pdf.stroke_line [x,0], [x,PAGE_HEIGHT]
     end
 
-    0.upto(GRAPH_MAJOR_ROWS).map {|i| i * PAGE_HEIGHT/GRAPH_MAJOR_ROWS }.each do |y|
+    (0..PAGE_HEIGHT).step(PAGE_HEIGHT/GRAPH_MAJOR_ROWS).each do |y|
       pdf.stroke_line [0,y], [PAGE_WIDTH,y]
     end
   end
