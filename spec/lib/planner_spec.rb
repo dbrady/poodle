@@ -47,15 +47,15 @@ describe Planner do
   # for Dec 26, 2011 would be e.g. "Dec 26 - Jan 1, 2012"
   describe ".date_label_for_week" do
     it "returns correct date string for the week" do
-      Planner.date_label_for_week(Date.parse("2012-03-12")).should == "Mar 12 - 18, 2012"
+      Planner.new(Date.parse("2012-03-12")).date_label_for_week.should == "Mar 12 - 18, 2012"
     end
 
     it "includes both month abbrevs when week spans months" do
-      Planner.date_label_for_week(Date.parse("2012-03-26")).should == "Mar 26 - Apr 1, 2012"
+      Planner.new(Date.parse("2012-03-26")).date_label_for_week.should == "Mar 26 - Apr 1, 2012"
     end
 
     it "includes months but NOT years when week spans year" do
-      Planner.date_label_for_week(Date.parse("2011-12-26")).should == "Dec 26 - Jan 1, 2012"
+      Planner.new(Date.parse("2011-12-26")).date_label_for_week.should == "Dec 26 - Jan 1, 2012"
     end
   end
 end

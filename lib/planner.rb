@@ -43,10 +43,19 @@ class Planner
   GRAPH_CELL_HEIGHT=9
   GRAPH_CELL_WIDTH=9
 
+  def initialize(start_date)
+    @start_date = start_date
+  end
+
   def self.draw(start_date, filename)
     start_date = self.beginning_of_workweek start_date
-    pdf = generate_planner_pdf start_date
+    # pdf = generate_planner_pdf start_date
+    # save_pdf pdf, filename
+
+    planner = Planner.new start_date
+    pdf = planner.generate_planner_pdf
     save_pdf pdf, filename
+
   end
 
   def self.save_pdf(pdf, filename)
@@ -73,7 +82,7 @@ class Planner
     start_date -= delta
   end
 
-  def self.check_column_positions(&block)
+  def check_column_positions(&block)
     (0...PAGE_WIDTH).step(COLUMN_WIDTH) do |i|
       yield CHECK_COLUMN_WIDTH + i
     end
@@ -85,14 +94,14 @@ class Planner
   # if it is spanned, mostly because it's very rare and the expansion
   # looks as weird as the unexpanded version. So the correct output
   # for Dec 26, 2011 would be e.g. "Dec 26 - Jan 1, 2012"
-  def self.date_label_for_week(start_date)
-      end_date = start_date + DAYS_PER_WEEK-1
-      label = start_date.strftime("%b %-d - ")
-      label += end_date.strftime("%b ") if end_date.month != start_date.month
+  def date_label_for_week
+      end_date = @start_date + DAYS_PER_WEEK-1
+      label = @start_date.strftime("%b %-d - ")
+      label += end_date.strftime("%b ") if end_date.month != @start_date.month
       label += end_date.strftime("%-d, %Y")
   end
 
-  def self.generate_planner_pdf(start_date)
+  def generate_planner_pdf
     Prawn::Document.new page_layout: :landscape do |pdf|
       # ======================================================================
       # Front Page
@@ -116,7 +125,7 @@ class Planner
 
       # vertical lines inside day lines for ticking of to-dos
       pdf.line_width THIN_LINE_WIDTH
-      Planner.check_column_positions do |x|
+      check_column_positions do |x|
         pdf.stroke_line [x,0], [x,BODY_HEIGHT]
       end
 
@@ -132,7 +141,7 @@ class Planner
       # ----------------------------------------------------------------------
 
       # Draw main title label, e.g "Jan 30-Feb 5, 2012
-      label = Planner.date_label_for_week start_date
+      label = date_label_for_week
 
       pdf.bounding_box [TITLE_X, TITLE_Y], width: TITLE_LABEL_WIDTH, height: TITLE_LABEL_HEIGHT do
         pdf.stroke_bounds
@@ -157,7 +166,7 @@ class Planner
       pdf.font_size = old_font_size
 
       # Draw day labels, e.g. "Mon 1/30", "Tue 1/31", "Wed 2/1" etc.
-      day_labels = (0...DAYS_PER_WEEK).map {|d| (start_date + d).strftime("%a   %-m/%-d")}
+      day_labels = (0...DAYS_PER_WEEK).map {|d| (@start_date + d).strftime("%a   %-m/%-d")}
 
       day_labels.map.with_index {|label, i| [label, (TODO_COLUMNS+i)*COLUMN_WIDTH]}.each do |label, x|
         pdf.text_box label, at: [x,PAGE_HEIGHT], height: HEADER_HEIGHT, width: COLUMN_WIDTH, align: :center, valign: :center, style: :bold
