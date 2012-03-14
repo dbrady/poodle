@@ -68,7 +68,7 @@ class Planner
     file.write pdf.render
   end
 
-  def check_column_positions(&block)
+  def checkbox_column_positions(&block)
     (0...PAGE_WIDTH).step(COLUMN_WIDTH) do |i|
       yield CHECK_COLUMN_WIDTH + i
     end
@@ -107,7 +107,7 @@ class Planner
 
     # vertical lines inside day lines for ticking of to-dos
     pdf.line_width THIN_LINE_WIDTH
-    check_column_positions do |x|
+    checkbox_column_positions do |x|
       pdf.stroke_line [x,0], [x,BODY_HEIGHT]
     end
 
