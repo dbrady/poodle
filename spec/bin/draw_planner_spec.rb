@@ -9,7 +9,10 @@ def execute_delete_planner(filename)
 end
 
 def get_md5_for_planner(filename)
-  `md5 #{filename} | awk '{ print $4 }'`.strip
+  # OSX
+  # `md5 #{filename} | awk '{ print $4 }'`.strip
+  # Linux
+  `md5sum #{filename} | awk '{print $1 }'`.strip
 end
 
 describe "Draw Planner (BLACK BOX API)" do
