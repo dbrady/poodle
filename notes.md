@@ -70,3 +70,55 @@ and once a year the date can span years as well: "Dec 31, 2012 - Jan 6
 just `strftime "%a %-m/%-d"` but the date range is a special
 formatter. Pass a helper method to Template? Dunno, let's burn that
 bridge when we get to it.
+
+# 2013-04-24
+
+Finished the conversion to MiniTest. In it I saw that the specs (and
+thus the tests that I converted) for Planner concern themselves almost
+entirely with the `date_label_for_week` method. I don't want to get
+off into the weeds messing with DateRange formatting but this is the
+strongest smell coming out of my test suite right now so I'm willing
+to follow it.
+
+I also found that `beginning_of_workweek` has two annoying
+dependencies: it is currently monkeypatched into Date, and it makes a
+key assumption about the first day of the week. I'm kind of okay about
+the second one because I don't see me changing that, ever, and the
+change seems simple enough should we want to make it more generic. But
+adding the monkeypatch got awkward from the test suite in some odd
+places (specifically when trying to test the Planner class without the
+monkeypatch loaded in advance. Seems like this is a weird load-order
+dependency that I should be able to clear up.)
+
+So, today's goals:
+
+* [X] Add Guard
+
+* [X] Extract `date_label_for_week` to some other class. Possibly a
+  `DateRange` of some kind. Look at ActiveSupport; they play around
+  with making `Date` an acceptable value to go inside a `Range`
+  object, though I'm pretty sure it makes no sense to try to teach
+  `Range` how to format times...
+
+* [X] Actually ended up extracting the `beginning_of_week` monkeypatch
+  into a Week class, where I expect `date_label_for_week` to reside
+  soon as well.
+
+* [X] Isolate the `date_patches.rb` dependency so it's cleaner.
+
+* [X] Ditto for `prawn_patches.rb` if possible?
+
+* [-] Try to refactor `test_draw_planner` to JUST test the bin driver
+  WITHOUT actually needing to call system() to do it. Probably could
+  do it by creating a `PlannerApplication` class and having
+  `draw_planner` just call `PlannerApplication.new(ARGV).run!` but I'm
+  not sure that's really the way I want to go. Will have to
+  see. Deferred for now. Can probably push args onto ARGV and then
+  spy out the Planner.create call; unsure.
+
+* [ ] The last big obvious smell coming from the code (so far--I
+  assume many more layers of smell are buried under this surface
+  layer) is from all the Prawn code. Start grouping up and isolating
+  all the Prawn drawing code. Right now we create and pass around a
+  `@pdf` ivar and do all our Prawn operations on it. See about
+  isolating that and extracting it to another class.
