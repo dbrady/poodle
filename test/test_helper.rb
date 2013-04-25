@@ -1,5 +1,6 @@
 require 'digest/md5'
 require 'stringio'
+require 'debugger'
 
 # FOR NOW: If you change the drawing template, visually inspect the
 # planner sheet and then update this checksum.
