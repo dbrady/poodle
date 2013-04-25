@@ -96,4 +96,17 @@ class TestWeek < MiniTest::Unit::TestCase
   ].each do |start_day, *days|
     make_test_methods_for_week :starting_on => start_day, :days => (14..27).to_a.zip(days)
   end
+
+  def test_date_label_for_week_returns_correct_date_string_for_week
+    Week.new(:date => Date.parse("2012-03-12")).date_label_for_week.must_equal "Mar 12 - 18, 2012"
+  end
+
+  def test_date_label_for_week_includes_both_months_when_week_spans_months
+    Week.new(:date => Date.parse("2012-03-26")).date_label_for_week.must_equal "Mar 26 - Apr 1, 2012"
+  end
+
+  def test_date_label_for_week_includes_months_but_not_years_when_week_spans_year
+    Week.new(:date => Date.parse("2011-12-26")).date_label_for_week.must_equal "Dec 26 - Jan 1, 2012"
+  end
+
 end

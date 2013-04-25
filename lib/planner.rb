@@ -44,7 +44,7 @@ class Planner
   GRAPH_CELL_HEIGHT=9
   GRAPH_CELL_WIDTH=9
 
-  attr_reader :pdf
+  attr_reader :pdf, :start_date
 
   def self.create(start_date, filename)
     File.open(filename, "w") do |file|
@@ -81,13 +81,6 @@ class Planner
   def generate_back_page
     draw_graph_paper
     draw_octant_outlines
-  end
-
-  def date_label_for_week
-    end_date = @start_date + DAYS_PER_WEEK-1
-    label = @start_date.strftime("%b %-d - ")
-    label += end_date.strftime("%b ") if end_date.month != @start_date.month
-    label += end_date.strftime("%-d, %Y")
   end
 
   def use_thick_pen
@@ -142,7 +135,7 @@ class Planner
   end
 
   def draw_page_title
-    label = date_label_for_week
+    label = Week.new(:date => start_date).date_label_for_week
 
     pdf.bounding_box [TITLE_X, TITLE_Y], width: TITLE_LABEL_WIDTH, height: TITLE_LABEL_HEIGHT do
       pdf.stroke_bounds
@@ -170,7 +163,7 @@ class Planner
   end
 
   def draw_day_column_labels
-    day_labels = (0...DAYS_PER_WEEK).map {|d| (@start_date + d).strftime("%a   %-m/%-d")}
+    day_labels = (0...DAYS_PER_WEEK).map {|d| (start_date + d).strftime("%a   %-m/%-d")}
 
     day_labels.map.with_index {|label, i| [label, (TODO_COLUMNS+i)*COLUMN_WIDTH]}.each do |label, x|
       pdf.text_box label, at: [x,PAGE_HEIGHT], height: HEADER_HEIGHT, width: COLUMN_WIDTH, align: :center, valign: :center, style: :bold
