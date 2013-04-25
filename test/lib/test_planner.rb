@@ -2,12 +2,6 @@ require 'minitest/autorun'
 require_relative '../test_helper'
 require 'date'
 require 'stringio'
-
-# UGH - monolithic interdependency hell
-# require_relative '../../lib/poodle'
-require 'prawn'
-require_relative '../../lib/date_patches'
-require_relative '../../lib/prawn_patches'
 require_relative '../../lib/planner'
 
 class TestPlanner < MiniTest::Unit::TestCase

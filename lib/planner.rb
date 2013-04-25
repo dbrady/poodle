@@ -1,3 +1,7 @@
+require "prawn"
+require_relative 'date_patches'
+require_relative 'prawn_patches'
+
 class Planner
   # Prawn-specific page layout units
   PAGE_WIDTH=720
@@ -213,4 +217,3 @@ class Planner
     end
   end
 end
-

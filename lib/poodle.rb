@@ -1,5 +1,2 @@
-require 'prawn'
-require_relative "date_patches"
-require_relative "prawn_patches"
+# Core Poodle Application
 require_relative "planner"
-
