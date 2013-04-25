@@ -6,6 +6,7 @@ gem "trollop", "~>2.0"
 group :development do
   gem "debugger"
   gem "guard", "~>1.0"
+  gem "guard-minitest", "~>0.5"
   gem "growl", "~>1.0"
 
   if RUBY_VERSION < '2.0.0'
