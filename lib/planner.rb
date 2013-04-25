@@ -1,6 +1,6 @@
 require "prawn"
-require_relative 'date_patches'
 require_relative 'prawn_patches'
+require_relative 'week'
 
 class Planner
   # Prawn-specific page layout units
@@ -53,7 +53,7 @@ class Planner
   end
 
   def initialize(start_date)
-    @start_date = start_date.beginning_of_workweek
+    @start_date = Week.new(:date => start_date).beginning_of_week
   end
 
   def generate_into(file)
