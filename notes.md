@@ -203,3 +203,20 @@ interpreted as
   shelving this one for now. Hard to make a smart enough general
   template for formatting date spans, so for now it's okay to
   custom-code it.
+
+More dev goals today:
+
+* [X] `use_thick_pen` and friends should restore pen to previous
+  state. Update: Yup, found several drawing methods that were
+  depending on the pen state being left over from previous
+  methods. Sadly, producing pixel-perfect, identical output still
+  yields a PDF file with a different hash. Might be worth it someday
+  to add an extra step to export the PDF as a very-high-resolution
+  image (e.g. BMP or TIFF, but be sure to suppress any changeable
+  metadata like timestamps) and then checksum the images. That way 2
+  PDFs that yield the same printed output would still look the same to
+  the acceptance test plan.
+
+  At any rate, I can tick this off my bucket list: unit-testing code
+  by holding two sheets of printed output over each other on a light
+  table to visually inspect for differences.

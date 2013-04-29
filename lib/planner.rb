@@ -84,12 +84,23 @@ class Planner
     draw_octant_outlines
   end
 
-  def use_thick_pen
-    pdf.line_width THICK_LINE_WIDTH
+  def with_pen_width(pen_width, &block)
+    old_width = pdf.line_width
+    pdf.line_width pen_width
+    yield
+    pdf.line_width old_width
   end
 
-  def use_thin_pen
-    pdf.line_width THIN_LINE_WIDTH
+  def with_thick_pen(&block)
+    with_pen_width(THICK_LINE_WIDTH) do
+      yield
+    end
+  end
+
+  def with_thin_pen(&block)
+    with_pen_width(THIN_LINE_WIDTH) do
+      yield
+    end
   end
 
   def with_light_pen(&block)
@@ -98,33 +109,44 @@ class Planner
     end
   end
 
+  def with_font_size(font_size, &block)
+    old_font_size = pdf.font_size
+    pdf.font_size = font_size
+    yield
+    pdf.font_size = old_font_size
+  end
+
   def draw_time_slots
-    use_thin_pen
-    with_light_pen do
-      (0..BODY_HEIGHT).step(TIME_SLOT_HEIGHT) do |y|
-        pdf.stroke_line [0,y], [PAGE_WIDTH,y]
+    with_thin_pen do
+      with_light_pen do
+        (0..BODY_HEIGHT).step(TIME_SLOT_HEIGHT) do |y|
+          pdf.stroke_line [0,y], [PAGE_WIDTH,y]
+        end
       end
     end
   end
 
   def draw_columns
-    use_thick_pen
-    (0..PAGE_WIDTH).step(COLUMN_WIDTH) do |x|
-      pdf.stroke_line [x,0], [x,PAGE_HEIGHT]
+    with_thick_pen do
+      (0..PAGE_WIDTH).step(COLUMN_WIDTH) do |x|
+        pdf.stroke_line [x,0], [x,PAGE_HEIGHT]
+      end
     end
   end
 
   def draw_checkoff_columns
-    use_thin_pen
-    (0...PAGE_WIDTH).step(COLUMN_WIDTH).map {|i| i + CHECK_COLUMN_WIDTH }.each do |x|
-      pdf.stroke_line [x,0], [x,BODY_HEIGHT]
+    with_thin_pen do
+      (0...PAGE_WIDTH).step(COLUMN_WIDTH).map {|i| i + CHECK_COLUMN_WIDTH }.each do |x|
+        pdf.stroke_line [x,0], [x,BODY_HEIGHT]
+      end
     end
   end
 
   def draw_lines_around_header_and_bottom
-    use_thick_pen
-    [0,BODY_HEIGHT,PAGE_HEIGHT].each do |y|
-      pdf.stroke_line [0,y], [PAGE_WIDTH,y]
+    with_thick_pen do
+      [0,BODY_HEIGHT,PAGE_HEIGHT].each do |y|
+        pdf.stroke_line [0,y], [PAGE_WIDTH,y]
+      end
     end
   end
 
@@ -138,9 +160,11 @@ class Planner
   def draw_page_title
     label = Week.new(:date => start_date).date_label
 
-    pdf.bounding_box [TITLE_X, TITLE_Y], width: TITLE_LABEL_WIDTH, height: TITLE_LABEL_HEIGHT do
-      pdf.stroke_bounds
-      pdf.text_box label, width: TITLE_LABEL_WIDTH, height: TITLE_LABEL_HEIGHT, align: :center, valign: :center, style: :bold
+    with_thick_pen do
+      pdf.bounding_box [TITLE_X, TITLE_Y], width: TITLE_LABEL_WIDTH, height: TITLE_LABEL_HEIGHT do
+        pdf.stroke_bounds
+        pdf.text_box label, width: TITLE_LABEL_WIDTH, height: TITLE_LABEL_HEIGHT, align: :center, valign: :center, style: :bold
+      end
     end
   end
 
@@ -171,13 +195,6 @@ class Planner
     end
   end
 
-  def with_font_size(font_size, &block)
-    old_font_size = pdf.font_size
-    pdf.font_size = font_size
-    yield
-    pdf.font_size = old_font_size
-  end
-
   def draw_labels
     draw_page_title
     with_font_size(HOURLY_LABEL_FONT_SIZE) do
@@ -188,26 +205,28 @@ class Planner
   end
 
   def draw_graph_paper
-    use_thin_pen
-    with_light_pen do
-      (0..PAGE_WIDTH).step(GRAPH_CELL_WIDTH) do |x|
-        pdf.stroke_line [x,0], [x,PAGE_HEIGHT]
-      end
+    with_thin_pen do
+      with_light_pen do
+        (0..PAGE_WIDTH).step(GRAPH_CELL_WIDTH) do |x|
+          pdf.stroke_line [x,0], [x,PAGE_HEIGHT]
+        end
 
-      (0..PAGE_HEIGHT).step(GRAPH_CELL_HEIGHT) do |y|
-        pdf.stroke_line [0,y], [PAGE_WIDTH,y]
+        (0..PAGE_HEIGHT).step(GRAPH_CELL_HEIGHT) do |y|
+          pdf.stroke_line [0,y], [PAGE_WIDTH,y]
+        end
       end
     end
   end
 
   def draw_octant_outlines
-    use_thick_pen
-    (0..PAGE_WIDTH).step(PAGE_WIDTH/GRAPH_MAJOR_COLUMNS).each do |x|
-      pdf.stroke_line [x,0], [x,PAGE_HEIGHT]
-    end
+    with_thick_pen do
+      (0..PAGE_WIDTH).step(PAGE_WIDTH/GRAPH_MAJOR_COLUMNS).each do |x|
+        pdf.stroke_line [x,0], [x,PAGE_HEIGHT]
+      end
 
-    (0..PAGE_HEIGHT).step(PAGE_HEIGHT/GRAPH_MAJOR_ROWS).each do |y|
-      pdf.stroke_line [0,y], [PAGE_WIDTH,y]
+      (0..PAGE_HEIGHT).step(PAGE_HEIGHT/GRAPH_MAJOR_ROWS).each do |y|
+        pdf.stroke_line [0,y], [PAGE_WIDTH,y]
+      end
     end
   end
 end
