@@ -2,6 +2,7 @@ source "http://rubygems.org"
 
 gem "prawn", "~>0.12"
 gem "trollop", "~>2.0"
+gem "scoped_attr_accessor", "~>1.0"
 
 group :development do
   gem "debugger", "~>1.5"

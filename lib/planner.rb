@@ -1,6 +1,7 @@
 require "prawn"
 require_relative 'prawn_patches'
 require_relative 'week'
+require 'scoped_attr_accessor/include'
 
 class Planner
   def self.create(start_date, filename)
@@ -19,7 +20,7 @@ class Planner
   end
 
   private
-  attr_reader :pdf, :start_date
+  private_attr_reader :pdf, :start_date
 
   # Prawn-specific page layout units
   PAGE_WIDTH=720
