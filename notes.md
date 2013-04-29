@@ -116,9 +116,90 @@ So, today's goals:
   see. Deferred for now. Can probably push args onto ARGV and then
   spy out the Planner.create call; unsure.
 
+# 2013-04-25
+
+Really pleased with the refactorings in `test_planner.rb`, but also
+surprised at how long it took--close to three hours. I think saving
+that time would have been a good example of a false economy, however:
+While those refactorings will not make the code better *enough* to
+make it worth three hours of refactoring, the refactorings *did* need
+to be done *and* I needed to get the *practice* doing them. I could
+now probably refactor code of the same complexity in about an hour,
+maybe less, and the benefits to that test file would be totally worth
+that amount of time. So in short, let's say it was a one-point
+refactoring, and thus totally worth it, but because I was learning as
+I went, it took me three hours instead of one.
+
+For today, I still have this task hanging out from yesterday:
+
 * [ ] The last big obvious smell coming from the code (so far--I
   assume many more layers of smell are buried under this surface
   layer) is from all the Prawn code. Start grouping up and isolating
   all the Prawn drawing code. Right now we create and pass around a
   `@pdf` ivar and do all our Prawn operations on it. See about
   isolating that and extracting it to another class.
+
+I also have the following goals for today:
+
+* [ ] Refactor the `test_date_label_for_week` tests. Yes, really--MORE
+  refactorings in the stupid tests. Because they read like crap right
+  now.
+
+* [ ] Rename `Week#date_label_for_week` to `Week#date_label` and come
+  up with a format language or give it a set of options, eg
+  `:date_separator => ' - '`, `:show_year_change_on_left => false`,
+  `:month_format => '%b'`, etc.
+
+# 2013-04-28
+
+Got sidetracked, spent most of the last 3 days writing the
+`scoped_attr_accessors` gem. Worth it. Will include it in the project
+as soon as appropriate, and then I'll be able to use this to
+demonstrate Refinements in my talk as a way to box-in the monkeypatch.
+Then if Poodle ever becomes a library, it won't do "Dependency
+Infection" of the SAR monkeypatch into Poodle's client.
+
+Same goals as where I left off, then, plus a few other refactorings
+
+- [X] Privatize all of Planner except for the three external methods;
+  see if it works. It does! Unit tests even still pass. Worried about
+  the `generate_into` method, though; not sure it really belongs on
+  Planner. But at least all the constants, prawn methods, and utility
+  crap has been tucked away where I can move it around without
+  breaking any client code.
+
+* [X] Refactor the `test_date_label_for_week` tests. Yes, really--MORE
+  refactorings in the stupid tests. Because they read like crap right
+  now.
+
+* [X] Rename `Week#date_label_for_week` to `Week#date_label` and come
+  up with a format language or give it a set of options, eg
+  `:date_separator => ' - '`, `:show_year_change_on_left => false`,
+  `:month_format => '%b'`, etc. (Did the rename, not the format lang.)
+
+A note on the formatting language. One possible language might be to
+express a single date format, but use () and [] to express things that
+should appear on one side or the other if they are the same, but on
+both sides if they change. So the format `(%b )%d[, %Y]` would be
+interpreted as
+
+* Check both sides against `%b`; if it doesn't change, it only goes on
+  the left hand side.
+* Check both sides against `, %Y`; if it doesn't change, it only goes
+  on the right hand side.
+* For the week of Monday, March 12th, 2012, then, the start date would
+  be formatted with `%b %d` and the end date would be formatted with
+  `%d, %Y`. This would yield `Mar 12` and `18, 2012` respectively,
+  which would be glued together with the separator string.
+* The week of Monday, December 26th, 2012, however, would end on a
+  different month and year, so both sides would receive `%b %d, %Y` as
+  their format strings.
+* One bug with this: I'm thinking towards generalizing this towards
+  arbitrary date ranges, and I could see problems with ranges that
+  span exactly 1 year (so the month wouldn't change, giving a
+  resulting label of `Mar 12, 2012-12, 2013`). There's also the odd
+  special case of date ranges that begin and end on the same
+  day. They'd show up as `Mar 12-12, 2012`. So I think I'm right in
+  shelving this one for now. Hard to make a smart enough general
+  template for formatting date spans, so for now it's okay to
+  custom-code it.
