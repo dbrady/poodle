@@ -2,6 +2,8 @@ require 'date'
 
 class Week
   DAYS_PER_WEEK = 7
+  DATE_RANGE_SEPARATOR = "-"
+
   attr_reader :week_starts_on, :date
 
   def initialize(opts)
@@ -24,9 +26,20 @@ class Week
     date - delta
   end
 
+  def month_differs?
+    beginning_of_week.month != end_of_week.month
+  end
+
+  def year_differs?
+    beginning_of_week.year != end_of_week.year
+  end
+
   def date_label
-    label = beginning_of_week.strftime("%b %-d - ")
-    label += end_of_week.strftime("%b ") if end_of_week.month != beginning_of_week.month
+    label = ""
+    label += beginning_of_week.strftime("%b %-d")
+    label += beginning_of_week.strftime(", %Y") if year_differs?
+    label += DATE_RANGE_SEPARATOR
+    label += end_of_week.strftime("%b ") if month_differs?
     label += end_of_week.strftime("%-d, %Y")
   end
 end

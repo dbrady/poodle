@@ -102,15 +102,15 @@ class TestWeek < MiniTest::Unit::TestCase
   end
 
   def test_date_label_for_week_returns_correct_date_string_for_week
-    assert_week_of_label_is_correct "2012-03-12", "Mar 12 - 18, 2012"
+    assert_week_of_label_is_correct "2012-03-12", "Mar 12-18, 2012"
   end
 
   def test_date_label_for_week_includes_both_months_when_week_spans_months
-    assert_week_of_label_is_correct "2012-03-26", "Mar 26 - Apr 1, 2012"
+    assert_week_of_label_is_correct "2012-03-26", "Mar 26-Apr 1, 2012"
   end
 
   def test_date_label_for_week_includes_months_but_not_years_when_week_spans_year
-    assert_week_of_label_is_correct "2011-12-26", "Dec 26 - Jan 1, 2012"
+    assert_week_of_label_is_correct "2011-12-26", "Dec 26, 2011-Jan 1, 2012"
   end
 
 end
