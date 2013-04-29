@@ -3,6 +3,24 @@ require_relative 'prawn_patches'
 require_relative 'week'
 
 class Planner
+  def self.create(start_date, filename)
+    File.open(filename, "w") do |file|
+      Planner.new(start_date).generate_into(file)
+    end
+  end
+
+  def initialize(start_date)
+    @start_date = Week.new(:date => start_date).beginning_of_week
+  end
+
+  def generate_into(file)
+    generate_pdf
+    write_to file
+  end
+
+  private
+  attr_reader :pdf, :start_date
+
   # Prawn-specific page layout units
   PAGE_WIDTH=720
   PAGE_HEIGHT=540
@@ -43,23 +61,6 @@ class Planner
   GRAPH_MAJOR_ROWS=2
   GRAPH_CELL_HEIGHT=9
   GRAPH_CELL_WIDTH=9
-
-  attr_reader :pdf, :start_date
-
-  def self.create(start_date, filename)
-    File.open(filename, "w") do |file|
-      Planner.new(start_date).generate_into(file)
-    end
-  end
-
-  def initialize(start_date)
-    @start_date = Week.new(:date => start_date).beginning_of_week
-  end
-
-  def generate_into(file)
-    generate_pdf
-    write_to file
-  end
 
   def write_to(file)
     file.write pdf.render
