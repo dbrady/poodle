@@ -84,21 +84,33 @@ class Planner
     draw_octant_outlines
   end
 
-  def with_pen_width(pen_width, &block)
-    old_width = pdf.line_width
-    pdf.line_width pen_width
+  def with_prawn_setting(setting, value, &block)
+    old_value = pdf.send setting
+    pdf.send "#{setting}=", value
     yield
-    pdf.line_width old_width
+    pdf.send "#{setting}=", old_value
+  end
+
+  def with_font_size(font_size, &block)
+    with_prawn_setting(:font_size, font_size) do
+      yield
+    end
+  end
+
+  def with_line_width(line_width, &block)
+    with_prawn_setting(:line_width, line_width) do
+      yield
+    end
   end
 
   def with_thick_pen(&block)
-    with_pen_width(THICK_LINE_WIDTH) do
+    with_line_width(THICK_LINE_WIDTH) do
       yield
     end
   end
 
   def with_thin_pen(&block)
-    with_pen_width(THIN_LINE_WIDTH) do
+    with_line_width(THIN_LINE_WIDTH) do
       yield
     end
   end
@@ -107,13 +119,6 @@ class Planner
     pdf.opacity LIGHT_LINE_OPACITY do
       yield
     end
-  end
-
-  def with_font_size(font_size, &block)
-    old_font_size = pdf.font_size
-    pdf.font_size = font_size
-    yield
-    pdf.font_size = old_font_size
   end
 
   def draw_time_slots
