@@ -19,8 +19,9 @@ class Planner
     write_to file
   end
 
-  private
   private_attr_reader :pdf, :start_date
+
+  private
 
   # Prawn-specific page layout units
   PAGE_WIDTH=720
