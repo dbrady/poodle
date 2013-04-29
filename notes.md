@@ -220,3 +220,66 @@ More dev goals today:
   At any rate, I can tick this off my bucket list: unit-testing code
   by holding two sheets of printed output over each other on a light
   table to visually inspect for differences.
+
+Okay, I'm grinding over and over the code and I just can't see where
+to start the next refactoring. There's just SO MUCH Prawn junk in
+there. I think maybe the next refactoring should be to create a
+`prawn_wrapper` that lets me talk to prawn the way I want to, and
+would also let me get all the SRP-violating guts out of planner and
+into some other file.
+
+The `generate_pdf` method seems to have an SRP violation, too. It's a
+weird 5-layer sandwich. Here's what happens there, in Planner's own
+words:
+
+1. I create a new pdf document.
+2. I send a `generate_front_page` message to myself, which triggers a
+   self-message cascade, like `draw_planner_skeleton` and
+   `draw_labels`, both which ultimately send drawing commands to pdf.
+3. I send a `start_new_page` message directly to pdf.
+4. I send a `generate_back_page` message to myself, with the same
+   effect of triggering a cascade of messages that ultimately send
+   drawing commands to pdf.
+5. I return the pdf document object. Now `generate_pdf` doesn't
+   actually know this, but I, Planner, do: the only reason I have this
+   message return the pdf object is so that in the calling code I can
+   send the `render` message to pdf and then write the result into a
+   buffer. That buffer is either an in-memory StringIO during testing,
+   or a disk file in production.
+
+So (I'm still in-character as Planner) I create an external PDF object
+and return it, which guarantees a Law of Demeter violation in the
+caller. This whole method is poorly composed, stateful,
+order-dependent and procedural. Do I clean this up or should I start
+over with a whole new strategy?
+
+Ultimately (OC now) I have a problem if I want to go document-style
+agnostic, and that is that the system outputs PDF files. There's not
+really a dependency I can inject there, is there? I can see injecting
+the the responsibility for writing to a buffer or to disk; that
+actually might make the `generate_into` method go away but still leave
+us with a testable program.
+
+Blarg, screw it. I'm gonna call it a night. Maybe go read some more
+POODR for inspiration. :-) Need to sleep on the core responsibilities
+here: Prawn ("I can create and draw on a PDF document"), Planner ("I
+orchestrate the generation of planner sheet"), some kind of
+PlannerDrawer ("I know how to what a planner sheet looks
+like"). Sounds like I need to lock down the interface between
+PlannerDrawer and Prawn. Were this C# or Java I'd create something
+like IDrawable or IDrawingSurface, create a Prawn wrapper to implement
+it, then have PlannerDrawer use IDrawer exclusively to create the
+planner sheet.
+
+Hmph. I can visualize that process nicely, actually:
+
+    | Planner | PlannerDrawer | IDrawing  | PrawnWrapper  | Prawn |
+    | draw--->| draw_line x,y | draw_line | convert x,y;  |       |
+    |         |               |           | stroke_line-->|       |
+
+
+But (hence the "Hmph") at the end of all that, though, I'm not really
+sure where a PDF comes back to the buffer without violating LoD or
+Tell Don't Ask. Hmm... maybe it *doesn't*? Maybe we pass a buffer
+object continuously eastward? Maybe Planner passes a buffer to
+PlannerDrawer, or even gets a PdfBuffer injected from its caller?
