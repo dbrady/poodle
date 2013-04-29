@@ -97,7 +97,7 @@ class TestWeek < MiniTest::Unit::TestCase
     make_test_methods_for_week :starting_on => start_day, :days => (14..27).to_a.zip(days)
   end
 
-  def assert_week_of_label_is_correct(date_string, expected_label)
+  def assert_week_of_label_is_correct date_string, expected_label
     Week.new(:date => Date.parse(date_string)).date_label.must_equal expected_label
   end
 
@@ -112,5 +112,4 @@ class TestWeek < MiniTest::Unit::TestCase
   def test_date_label_for_week_includes_months_but_not_years_when_week_spans_year
     assert_week_of_label_is_correct "2011-12-26", "Dec 26, 2011-Jan 1, 2012"
   end
-
 end

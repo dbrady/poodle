@@ -4,17 +4,17 @@ require_relative 'week'
 require 'scoped_attr_accessor/include'
 
 class Planner
-  def self.create(start_date, filename)
+  def self.create start_date, filename
     File.open(filename, "w") do |file|
-      Planner.new(start_date).generate_into(file)
+      Planner.new(start_date).generate_into file
     end
   end
 
-  def initialize(start_date)
+  def initialize start_date
     @start_date = Week.new(:date => start_date).beginning_of_week
   end
 
-  def generate_into(file)
+  def generate_into file
     generate_pdf
     write_to file
   end
@@ -69,7 +69,7 @@ class Planner
   GRAPH_CELL_HEIGHT=9
   GRAPH_CELL_WIDTH=9
 
-  def write_to(file)
+  def write_to file
     file.write pdf.render
   end
 
@@ -91,38 +91,38 @@ class Planner
     draw_octant_outlines
   end
 
-  def with_prawn_setting(setting, value, &block)
+  def with_prawn_setting setting, value, &block
     old_value = pdf.send setting
     pdf.send "#{setting}=", value
     yield
     pdf.send "#{setting}=", old_value
   end
 
-  def with_font_size(font_size, &block)
+  def with_font_size font_size, &block
     with_prawn_setting(:font_size, font_size) do
       yield
     end
   end
 
-  def with_line_width(line_width, &block)
+  def with_line_width line_width, &block
     with_prawn_setting(:line_width, line_width) do
       yield
     end
   end
 
-  def with_thick_pen(&block)
+  def with_thick_pen &block
     with_line_width(THICK_LINE_WIDTH) do
       yield
     end
   end
 
-  def with_thin_pen(&block)
+  def with_thin_pen &block
     with_line_width(THIN_LINE_WIDTH) do
       yield
     end
   end
 
-  def with_light_pen(&block)
+  def with_light_pen &block
     pdf.opacity LIGHT_LINE_OPACITY do
       yield
     end
@@ -184,7 +184,7 @@ class Planner
     (START_HOUR..END_HOUR).each do |hour|
       # This is SO nasty. It sets how far down the page the hour
       # labels start counting--which was chosen arbitrarily.
-      y = (BODY_HEIGHT+TIME_SLOT_HEIGHT)-hour*HOUR_HEIGHT
+      y = BODY_HEIGHT + TIME_SLOT_HEIGHT - hour * HOUR_HEIGHT
       [1,4].map {|column| column * COLUMN_WIDTH }.each do |x|
         label = (hour%12).to_s
         label = "12" if label == "0"
@@ -200,7 +200,7 @@ class Planner
   end
 
   def draw_day_column_labels
-    day_labels = (0...DAYS_PER_WEEK).map {|d| (start_date + d).strftime("%a   %-m/%-d")}
+    day_labels = (0...DAYS_PER_WEEK).map {|d| (start_date + d).strftime "%a   %-m/%-d" }
 
     day_labels.map.with_index {|label, i| [label, (TODO_COLUMNS+i)*COLUMN_WIDTH]}.each do |label, x|
       pdf.text_box label, at: [x,PAGE_HEIGHT], height: HEADER_HEIGHT, width: COLUMN_WIDTH, align: :center, valign: :center, style: :bold
