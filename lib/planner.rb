@@ -4,14 +4,17 @@ require_relative 'week'
 require 'scoped_attr_accessor/include'
 
 class Planner
-  def self.create start_date, filename
+  def self.create opts
+    date = opts.fetch :date
+    filename = opts.fetch :filename
     File.open(filename, "w") do |file|
-      Planner.new(start_date).generate_into file
+      Planner.new(:date => date).generate_into file
     end
   end
 
-  def initialize start_date
-    @start_date = Week.new(:date => start_date).beginning_of_week
+  def initialize opts
+    date = opts.fetch :date
+    @date = Week.new(:date => date).beginning_of_week
   end
 
   def generate_into file
@@ -19,7 +22,7 @@ class Planner
     write_to file
   end
 
-  private_attr_reader :pdf, :start_date
+  private_attr_reader :pdf, :date
 
   private
 
@@ -170,7 +173,7 @@ class Planner
   end
 
   def draw_page_title
-    label = Week.new(:date => start_date).date_label
+    label = Week.new(:date => date).date_label
 
     with_thick_pen do
       pdf.bounding_box [TITLE_X, TITLE_Y], width: TITLE_LABEL_WIDTH, height: TITLE_LABEL_HEIGHT do
@@ -200,7 +203,8 @@ class Planner
   end
 
   def draw_day_column_labels
-    day_labels = (0...DAYS_PER_WEEK).map {|d| (start_date + d).strftime "%a   %-m/%-d" }
+    # TODO: SRPV. This is template/render code
+    day_labels = (0...DAYS_PER_WEEK).map {|d| (date + d).strftime "%a   %-m/%-d" }
 
     day_labels.map.with_index {|label, i| [label, (TODO_COLUMNS+i)*COLUMN_WIDTH]}.each do |label, x|
       pdf.text_box label, at: [x,PAGE_HEIGHT], height: HEADER_HEIGHT, width: COLUMN_WIDTH, align: :center, valign: :center, style: :bold

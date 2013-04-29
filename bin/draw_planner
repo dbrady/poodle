@@ -1,14 +1,11 @@
 #!/usr/bin/env ruby
 require 'date'
 require 'trollop'
-require_relative '../lib/poodle'
+require_relative '../lib/planner_application'
 
 opts = Trollop.options do
-  opt :date, "Start date of planner (planner will start on the Monday of the week that includes that date)", :type => :string, :default => nil
+  opt :date, "Date this planner should include (planner will start on the Monday of the week that includes that date)", :type => :string, :default => Date.today.strftime("%F")
   opt :filename, "Output filename", :type => :string, :default => 'planner_sheet.pdf'
 end
 
-start_date = opts[:date] ? Date.parse(opts[:date]) : Date.today
-filename = opts[:filename]
-
-Planner.create start_date, filename
+PlannerApplication.create :class => Planner, :date => opts[:date], :filename => opts[:filename]

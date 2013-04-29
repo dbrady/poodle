@@ -15,7 +15,7 @@ class TestPlanner < MiniTest::Unit::TestCase
   end
 
   def test_creates_pdf_with_correct_md5_checksum
-    Planner.new(@date).generate_into buffer
+    Planner.new(:date => @date).generate_into buffer
     buffer.md5.must_equal MAGIC_MD5_CHECKSUM
   end
 end

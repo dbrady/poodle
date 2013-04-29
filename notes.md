@@ -1,6 +1,7 @@
 # Notes
 
-## 2013-04-22
+---
+# 2013-04-22
 
 Prior to MWRC, planner.rb contained the code for bin/draw_planner and
 there were no methods or classes anywhere; all I did to refactor it
@@ -71,6 +72,8 @@ just `strftime "%a %-m/%-d"` but the date range is a special
 formatter. Pass a helper method to Template? Dunno, let's burn that
 bridge when we get to it.
 
+
+---
 # 2013-04-24
 
 Finished the conversion to MiniTest. In it I saw that the specs (and
@@ -116,6 +119,7 @@ So, today's goals:
   see. Deferred for now. Can probably push args onto ARGV and then
   spy out the Planner.create call; unsure.
 
+---
 # 2013-04-25
 
 Really pleased with the refactorings in `test_planner.rb`, but also
@@ -150,6 +154,7 @@ I also have the following goals for today:
   `:date_separator => ' - '`, `:show_year_change_on_left => false`,
   `:month_format => '%b'`, etc.
 
+---
 # 2013-04-28
 
 Got sidetracked, spent most of the last 3 days writing the
@@ -283,3 +288,70 @@ sure where a PDF comes back to the buffer without violating LoD or
 Tell Don't Ask. Hmm... maybe it *doesn't*? Maybe we pass a buffer
 object continuously eastward? Maybe Planner passes a buffer to
 PlannerDrawer, or even gets a PdfBuffer injected from its caller?
+
+Thoughts as I meditate on POODR:
+
+* Consider the messages, not the objects. This may reveal the
+  application. For example, Planner needs to stop going into Prawn's
+  kitchen and telling it how to cook. It needs to simply order a
+  PlannerSheet from the menu. AHHH! A wild PlannerSheet appears! NOW
+  we're getting somewhere. So Planner simply tells PlannerSheet "I
+  want a PDF planner sheet for the week of April 29, 2013." Maybe it
+  even tells PlannerSheet where to render it; not sure. Or maybe it
+  gets back the PlannerSheet all set to be rendered and then it calls
+  `planner_sheet.render_on(buffer)` and we're done. Interesting!
+* "Do not succumb to a class that has an ill-defined or absent public
+  interface." (p79) Prawn requires me to use PDF metrics to speak to
+  it; I may wish to change this. For example, to draw a vertical line
+  on the page, I shouldn't need to know that this is at x coordinate
+  360 in PDF twips. Care must be taken, however, that switching to a
+  system that allows floating point geometry doesn't lose me my
+  pixel-perfect drawings! Hmm, and by "care must be taken" I mean
+  "tests must be assayed". I am already working with Prawn in
+  fractions of PDF twips, perhaps a Float could hold everything I
+  need.
+
+Perhaps a sequence diagram like:
+
+    Planner       PlannerSheet        Week    Drawing
+       |                |              |         |
+       |                |              |         |
+       |               +-+             |         |
+       |draw(date)---->| |             |         |
+       |               | |new(date)--->|         |
+       |               | |<- - - - - - |         |
+       |               | |             |         |
+       |               | |new------------------->|
+       |               | |<- - - - - - - - - - - |
+       |               | |             |         |
+
+No. this is West-facing code. Instead of Drawing we need a
+Template, and `PlannerSheet` calls `Template.new(self)` Oh, except
+that now the Template needs to know to call back to the planner sheet
+for the data items it needs to draw, so *it* really knows how to
+draw... wait. Maybe that's NOT crazy. Maybe that's EXACTLY how it
+works. Drawing calls back to PlannerSheet for it's title, which will
+return the date range label "Mar 12-19, 2012" etc. Then it calls back
+for the dates in the 7-day range... hmmmm!
+
+---
+# 2013-04-29
+
+Okay, at the end of today the design is what it is. I'm tagging it as
+the ruby 1.8 code (even though it doesn't actually run on 1.8
+anymore--ssshhhh! It's not my fault, some of the gems are no longer
+available from three years back) and starting the ruby 2 port so I can
+write my talk.
+
+Today:
+
+- [ ] Work out message flows. Try to discover objects and interfaces
+  using the messages.
+
+- [ ] ??? Update this list based on those discoveries and act on them
+
+- [X] Convert to Seattle.rb paren style
+
+- [ ] Tune planner sheet visually the way I like it
+
+- [ ] Sweep code and mark with TODOs for refactorings

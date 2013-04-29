@@ -1,2 +1,2 @@
 # Core Poodle Application
-require_relative "planner"
+require_relative "planner_application"
