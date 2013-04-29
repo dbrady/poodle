@@ -24,7 +24,7 @@ class Week
     date - delta
   end
 
-  def date_label_for_week
+  def date_label
     label = beginning_of_week.strftime("%b %-d - ")
     label += end_of_week.strftime("%b ") if end_of_week.month != beginning_of_week.month
     label += end_of_week.strftime("%-d, %Y")

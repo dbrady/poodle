@@ -136,7 +136,7 @@ class Planner
   end
 
   def draw_page_title
-    label = Week.new(:date => start_date).date_label_for_week
+    label = Week.new(:date => start_date).date_label
 
     pdf.bounding_box [TITLE_X, TITLE_Y], width: TITLE_LABEL_WIDTH, height: TITLE_LABEL_HEIGHT do
       pdf.stroke_bounds

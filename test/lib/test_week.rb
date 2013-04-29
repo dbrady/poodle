@@ -40,7 +40,7 @@ class TestWeek < MiniTest::Unit::TestCase
       assert_rewinds :from => mday_to_iso_string(from), :to => mday_to_iso_string(to)
     end
   end
-  
+
   def self.make_test_methods_for_week opts
     opts[:days].each do |from, to|
       make_test_method_for_week_and_date opts[:starting_on], from, to
@@ -71,21 +71,21 @@ class TestWeek < MiniTest::Unit::TestCase
   # seeing a clean way to do this in MiniTest. Then again, I just
   # tried to do this in RSpec and defining that inner loop of from ->
   # to dates is actually still kind of atough.
-  
-  #       April 2013       
-  #  Su Mo Tu We Th Fr Sa  
-  #  1  2  3  4  5  6  
-  #  7  8  9 10 11 12 13  
-  # 14 15 16 17 18 19 20  
-  # 21 22 23 24 25 26 27  
-  # 28 29 30              
+
+  #       April 2013
+  #  Su Mo Tu We Th Fr Sa
+  #  1  2  3  4  5  6
+  #  7  8  9 10 11 12 13
+  # 14 15 16 17 18 19 20
+  # 21 22 23 24 25 26 27
+  # 28 29 30
 
   # If the work |
   # week starts |
   # on this day | And we pick a week on this day in April 2013, when does THAT week begin?
   # ------------+---------------------------------------------------------------------|
   # Weekday     | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 |
-  [  
+  [
    ["Monday",      8,  15,  15,  15,  15,  15,  15,  15,  22,  22,  22,  22,  22,  22 ],
    ["Tuesday",     9,   9,  16,  16,  16,  16,  16,  16,  16,  23,  23,  23,  23,  23 ],
    ["Wednesday",  10,  10,  10,  17,  17,  17,  17,  17,  17,  17,  24,  24,  24,  24 ],
@@ -97,16 +97,20 @@ class TestWeek < MiniTest::Unit::TestCase
     make_test_methods_for_week :starting_on => start_day, :days => (14..27).to_a.zip(days)
   end
 
+  def assert_week_of_label_is_correct(date_string, expected_label)
+    Week.new(:date => Date.parse(date_string)).date_label.must_equal expected_label
+  end
+
   def test_date_label_for_week_returns_correct_date_string_for_week
-    Week.new(:date => Date.parse("2012-03-12")).date_label_for_week.must_equal "Mar 12 - 18, 2012"
+    assert_week_of_label_is_correct "2012-03-12", "Mar 12 - 18, 2012"
   end
 
   def test_date_label_for_week_includes_both_months_when_week_spans_months
-    Week.new(:date => Date.parse("2012-03-26")).date_label_for_week.must_equal "Mar 26 - Apr 1, 2012"
+    assert_week_of_label_is_correct "2012-03-26", "Mar 26 - Apr 1, 2012"
   end
 
   def test_date_label_for_week_includes_months_but_not_years_when_week_spans_year
-    Week.new(:date => Date.parse("2011-12-26")).date_label_for_week.must_equal "Dec 26 - Jan 1, 2012"
+    assert_week_of_label_is_correct "2011-12-26", "Dec 26 - Jan 1, 2012"
   end
 
 end
