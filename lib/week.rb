@@ -2,6 +2,7 @@ require 'date'
 
 class Week
   DAYS_PER_WEEK = 7
+  # TODO: SRPV. This belongs in template-drawing code
   DATE_RANGE_SEPARATOR = "-"
 
   attr_reader :week_starts_on, :date
@@ -20,6 +21,18 @@ class Week
     beginning_of_week + (DAYS_PER_WEEK - 1)
   end
 
+  # TODO: SRPV? This belongs in template-drawing code
+  def date_label
+    label = ""
+    label += beginning_of_week.strftime("%b %-d")
+    label += beginning_of_week.strftime(", %Y") if year_differs?
+    label += DATE_RANGE_SEPARATOR
+    label += end_of_week.strftime("%b ") if month_differs?
+    label += end_of_week.strftime("%-d, %Y")
+  end
+
+  private
+
   def calculate_beginning_of_week
     delta = date.wday - week_starts_on
     delta += 7 if delta < 0 # wrap around to previous week
@@ -32,14 +45,5 @@ class Week
 
   def year_differs?
     beginning_of_week.year != end_of_week.year
-  end
-
-  def date_label
-    label = ""
-    label += beginning_of_week.strftime("%b %-d")
-    label += beginning_of_week.strftime(", %Y") if year_differs?
-    label += DATE_RANGE_SEPARATOR
-    label += end_of_week.strftime("%b ") if month_differs?
-    label += end_of_week.strftime("%-d, %Y")
   end
 end
