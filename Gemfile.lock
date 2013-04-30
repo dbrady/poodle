@@ -45,6 +45,7 @@ GEM
       coderay (~> 1.0.5)
       method_source (~> 0.8)
       slop (~> 3.4)
+    rake (10.0.4)
     rb-fchange (0.0.6)
       ffi
     rb-fsevent (0.9.3)
@@ -72,6 +73,7 @@ DEPENDENCIES
   guard (~> 1.0)
   guard-minitest (~> 0.5)
   prawn (~> 0.12)
+  rake (~> 10.0)
   rb-fchange (~> 0.0)
   rb-fsevent (~> 0.9)
   rb-inotify (~> 0.9)
