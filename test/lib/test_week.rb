@@ -1,6 +1,6 @@
 require 'minitest/autorun'
-require_relative '../test_helper'
-require_relative '../../lib/week'
+require File.expand_path(File.join(File.dirname(__FILE__), '../test_helper'))
+require File.expand_path(File.join(File.dirname(__FILE__), '../../lib/week'))
 
 class TestWeek < MiniTest::Unit::TestCase
   def assert_rewinds opts
