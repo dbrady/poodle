@@ -5,8 +5,10 @@ class PlannerApplication
   def self.create opts
     klass = opts.fetch :class
     date = Date.parse(opts.fetch :date)
-    filename = opts.fetch :filename
+    buffer = opts[:buffer] || File.open(opts[:filename], "w")
 
-    klass.create :date => date, :filename => filename
+    klass.new(:date => date).generate_into buffer
+
+    buffer.close
   end
 end

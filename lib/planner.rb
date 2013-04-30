@@ -4,24 +4,15 @@ require_relative 'week'
 require 'scoped_attr_accessor/include'
 
 class Planner
-  def self.create opts
-    date = opts.fetch :date
-    filename = opts.fetch :filename
-    File.open(filename, "w") do |file|
-      Planner.new(:date => date).generate_into file
-    end
-  end
-
   def initialize opts
     date = opts.fetch :date
     @date = Week.new(:date => date).beginning_of_week
   end
 
-  def generate_into file
+  def generate_into buffer
     generate_pdf
-    write_to file
+    write_to buffer
   end
-
   private_attr_reader :pdf, :date
 
   private
