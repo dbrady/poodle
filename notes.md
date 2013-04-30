@@ -345,13 +345,26 @@ write my talk.
 
 Today:
 
-- [ ] Work out message flows. Try to discover objects and interfaces
+- [X] Work out message flows. Try to discover objects and interfaces
   using the messages.
 
-- [ ] ??? Update this list based on those discoveries and act on them
+- [X] Wow. Lots of classes popped out, notably PlannerApplication and
+  PlannerTemplate. The PlannerTemplate class is still doing WAY too
+  much but at least it's extricated from Prawn and the Planner logic
 
 - [X] Convert to Seattle.rb paren style
 
-- [ ] Tune planner sheet visually the way I like it
+- [X] Tune planner sheet visually the way I like it
 
-- [ ] Sweep code and mark with TODOs for refactorings
+- [X] Sweep code and mark with TODOs for refactorings
+
+- [X] DO said refactorings :-)
+
+YAY! It is what it is, mates. It isn't what I love but compared to
+what it was a month ago I think I almost *like* this code. Tomorrow
+I'll begin writing my talk, explaining the app as it is in this state,
+and then begin a catalog of Ruby 2 refactorings for the talk. Then
+I'll do the refactorings, tagging as I go along, and we'll be able to
+work through the code collectively during the talk.
+
+Woo, excited!
