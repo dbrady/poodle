@@ -368,3 +368,12 @@ I'll do the refactorings, tagging as I go along, and we'll be able to
 work through the code collectively during the talk.
 
 Woo, excited!
+
+---
+# 2013-04-30
+
+It's talk-write o'clock!
+
+Oops, used require_relative where I should've used that horrific
+`File.expand_path(File.join(File.dirname(__FILE__), ...))`
+business. Ahem, "Fixing."

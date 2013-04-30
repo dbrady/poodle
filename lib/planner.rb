@@ -1,6 +1,6 @@
-require_relative 'week'
+require File.expand_path(File.join(File.dirname(__FILE__), 'week'))
 require 'scoped_attr_accessor/include'
-require_relative 'planner_template'
+require File.expand_path(File.join(File.dirname(__FILE__), 'planner_template'))
 
 class Planner
   private_attr_reader :template
