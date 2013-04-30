@@ -1,5 +1,5 @@
 require "prawn"
-require_relative 'prawn_wrapper'
+require File.expand_path(File.join(File.dirname(__FILE__), 'prawn_wrapper'))
 
 class PlannerTemplate
   # Text string to separate beginning and end dates in date range
