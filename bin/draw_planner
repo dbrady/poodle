@@ -4,8 +4,8 @@ require 'trollop'
 require File.expand_path(File.join(File.dirname(__FILE__), '../lib/planner_application'))
 
 opts = Trollop.options do
-  opt :date, "Date this planner should include (planner will start on the Monday of the week that includes that date)", :type => :string, :default => Date.today.strftime("%F")
-  opt :filename, "Output filename", :type => :string, :default => 'planner_sheet.pdf'
+  opt :date, "Date this planner should include (planner will start on the Monday of the week that includes that date)", type: :string, default: Date.today.strftime("%F")
+  opt :filename, "Output filename", type: :string, default: 'planner_sheet.pdf'
 end
 
-PlannerApplication.create :class => Planner, :date => opts[:date], :filename => opts[:filename]
+PlannerApplication.create class: Planner, date: opts[:date], filename: opts[:filename]

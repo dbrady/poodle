@@ -8,8 +8,8 @@ class Planner
   attr_reader :week
 
   def initialize opts
-    @week = Week.new(:date => opts.fetch(:date))
-    @template = PlannerTemplate.new :planner => self
+    @week = Week.new(date: opts.fetch(:date))
+    @template = PlannerTemplate.new planner: self
   end
 
   def generate_into buffer

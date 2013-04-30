@@ -168,7 +168,7 @@ class PlannerTemplate
 
   def draw_columns
     with_thick_pen do
-      column_x_positions(:include_right_edge => true).each do |x|
+      column_x_positions(include_right_edge: true).each do |x|
         prawn.stroke_line [x,0], [x,PAGE_HEIGHT]
       end
     end

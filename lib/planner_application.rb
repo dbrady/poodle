@@ -7,7 +7,7 @@ class PlannerApplication
     date = Date.parse(opts.fetch :date)
     buffer = opts[:buffer] || File.open(opts[:filename], "w")
 
-    klass.new(:date => date).generate_into buffer
+    klass.new(date: date).generate_into buffer
 
     buffer.close
   end

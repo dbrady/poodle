@@ -4,11 +4,11 @@ require File.expand_path(File.join(File.dirname(__FILE__), '../../lib/planner_te
 
 class TestWeek < MiniTest::Unit::TestCase
   def setup
-    @template = PlannerTemplate.new :planner => nil
+    @template = PlannerTemplate.new planner: nil
   end
 
   def assert_week_of_label_is_correct date_string, expected_label
-    week = Week.new(:date => Date.parse(date_string))
+    week = Week.new(date: Date.parse(date_string))
     @template.format_week(week).must_equal expected_label
   end
 

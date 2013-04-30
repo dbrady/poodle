@@ -7,7 +7,7 @@ class TestWeek < MiniTest::Unit::TestCase
     from = Date.parse opts[:from]
     to = Date.parse opts[:to]
 
-    week = Week.new :date => from, :starts_on => @start_week_on
+    week = Week.new date: from, starts_on: @start_week_on
     week.first.must_equal to
   end
 
@@ -37,7 +37,7 @@ class TestWeek < MiniTest::Unit::TestCase
   def self.make_test_method_for_week_and_date week_starting_on, from, to
     define_method(make_test_method_name week_starting_on, from, to) do
       @start_week_on = week_starting_on
-      assert_rewinds :from => mday_to_iso_string(from), :to => mday_to_iso_string(to)
+      assert_rewinds from: mday_to_iso_string(from), to: mday_to_iso_string(to)
     end
   end
 
@@ -94,10 +94,10 @@ class TestWeek < MiniTest::Unit::TestCase
    ["Saturday",   13,  13,  13,  13,  13,  13,  20,  20,  20,  20,  20,  20,  20,  27 ],
    ["Sunday",     14,  14,  14,  14,  14,  14,  14,  21,  21,  21,  21,  21,  21,  21 ]
   ].each do |start_day, *days|
-    make_test_methods_for_week :starting_on => start_day, :days => (14..27).to_a.zip(days)
+    make_test_methods_for_week starting_on: start_day, days: (14..27).to_a.zip(days)
   end
 
   def test_days_returns_mappable
-    Week.new(:date => Date.parse("2013-04-29")).days.map {|day| day.mday }.must_equal [29, 30, 1, 2, 3, 4, 5]
+    Week.new(date: Date.parse("2013-04-29")).days.map {|day| day.mday }.must_equal [29, 30, 1, 2, 3, 4, 5]
   end
 end
