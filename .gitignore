@@ -1,6 +1,2 @@
-*.gem
-.bundle
-Gemfile.lock
-pkg/*
 *.pdf
 .DS_Store
