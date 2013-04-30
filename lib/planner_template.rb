@@ -1,23 +1,41 @@
 require "prawn"
-require_relative 'prawn_patches'
+require_relative 'prawn_wrapper'
 
 class PlannerTemplate
-  private_attr_reader :pdf, :date
+  # Text string to separate beginning and end dates in date range
+  DATE_RANGE_SEPARATOR = "-"
+
+  private_attr_reader :prawn, :planner
 
   def initialize(opts)
-    @date = opts[:date]
+    @planner = opts.fetch :planner
   end
 
   def write_to file
-    file.write pdf.render
+    file.write prawn.render
   end
 
   def generate_pdf
-    @pdf = Prawn::Document.new page_layout: :landscape
+    @prawn = PrawnWrapper.new
     generate_front_page
-    pdf.start_new_page
+    prawn.start_new_page
     generate_back_page
-    @pdf
+    @prawn
+  end
+
+  # Returns a text string representing the date range of the week. If
+  # both the year and the month change, both will be present in the
+  # range, e.g. "Dec 26, 2011-Jan 1, 2012". Year will be omitted from
+  # the first date if the year does not change: "Mar 26-Apr 1,
+  # 2012". Month will be omitted from the second date if it does not
+  # change: "Mar 12-18, 2012".
+  def format_week(week)
+    label = ""
+    label += week.first.strftime "%b %-d"
+    label += week.first.strftime ", %Y" if week.year_differs?
+    label += DATE_RANGE_SEPARATOR
+    label += week.last.strftime "%b " if week.month_differs?
+    label += week.last.strftime "%-d, %Y"
   end
 
   private
@@ -79,10 +97,10 @@ class PlannerTemplate
   end
 
   def with_prawn_setting setting, value, &block
-    old_value = pdf.send setting
-    pdf.send "#{setting}=", value
+    old_value = prawn.send setting
+    prawn.send "#{setting}=", value
     yield
-    pdf.send "#{setting}=", old_value
+    prawn.send "#{setting}=", old_value
   end
 
   def with_font_size font_size, &block
@@ -110,7 +128,7 @@ class PlannerTemplate
   end
 
   def with_light_pen &block
-    pdf.opacity LIGHT_LINE_OPACITY do
+    prawn.opacity LIGHT_LINE_OPACITY do
       yield
     end
   end
@@ -119,7 +137,7 @@ class PlannerTemplate
     with_thin_pen do
       with_light_pen do
         (0..BODY_HEIGHT).step(TIME_SLOT_HEIGHT) do |y|
-          pdf.stroke_line [0,y], [PAGE_WIDTH,y]
+          prawn.stroke_line [0,y], [PAGE_WIDTH,y]
         end
       end
     end
@@ -128,7 +146,7 @@ class PlannerTemplate
   def draw_columns
     with_thick_pen do
       (0..PAGE_WIDTH).step(COLUMN_WIDTH) do |x|
-        pdf.stroke_line [x,0], [x,PAGE_HEIGHT]
+        prawn.stroke_line [x,0], [x,PAGE_HEIGHT]
       end
     end
   end
@@ -136,7 +154,7 @@ class PlannerTemplate
   def draw_checkoff_columns
     with_thin_pen do
       (0...PAGE_WIDTH).step(COLUMN_WIDTH).map {|i| i + CHECK_COLUMN_WIDTH }.each do |x|
-        pdf.stroke_line [x,0], [x,BODY_HEIGHT]
+        prawn.stroke_line [x,0], [x,BODY_HEIGHT]
       end
     end
   end
@@ -144,7 +162,7 @@ class PlannerTemplate
   def draw_lines_around_header_and_bottom
     with_thick_pen do
       [0,BODY_HEIGHT,PAGE_HEIGHT].each do |y|
-        pdf.stroke_line [0,y], [PAGE_WIDTH,y]
+        prawn.stroke_line [0,y], [PAGE_WIDTH,y]
       end
     end
   end
@@ -157,12 +175,12 @@ class PlannerTemplate
   end
 
   def draw_page_title
-    label = Week.new(:date => date).date_label
+    label = format_week planner.week
 
     with_thick_pen do
-      pdf.bounding_box [TITLE_X, TITLE_Y], width: TITLE_LABEL_WIDTH, height: TITLE_LABEL_HEIGHT do
-        pdf.stroke_bounds
-        pdf.text_box label, width: TITLE_LABEL_WIDTH, height: TITLE_LABEL_HEIGHT, align: :center, valign: :center, style: :bold
+      prawn.bounding_box [TITLE_X, TITLE_Y], width: TITLE_LABEL_WIDTH, height: TITLE_LABEL_HEIGHT do
+        prawn.stroke_bounds
+        prawn.text_box label, width: TITLE_LABEL_WIDTH, height: TITLE_LABEL_HEIGHT, align: :center, valign: :center, style: :bold
       end
     end
   end
@@ -175,23 +193,23 @@ class PlannerTemplate
       [1,4].map {|column| column * COLUMN_WIDTH }.each do |x|
         label = (hour%12).to_s
         label = "12" if label == "0"
-        pdf.bounding_box [x,y], width: CHECK_COLUMN_WIDTH, height: HOUR_HEIGHT do
-          pdf.text_box label, width: CHECK_COLUMN_WIDTH, height: HOUR_HEIGHT, align: :right, valign: :center
+        prawn.bounding_box [x,y], width: CHECK_COLUMN_WIDTH, height: HOUR_HEIGHT do
+          prawn.text_box label, width: CHECK_COLUMN_WIDTH, height: HOUR_HEIGHT, align: :right, valign: :center
         end
       end
     end
   end
 
   def draw_task_column_labels
-    pdf.text_box "Tasks", at: [0, PAGE_HEIGHT], height: HEADER_HEIGHT, width: COLUMN_WIDTH, align: :center, valign: :center, style: :bold
+    prawn.text_box "Tasks", at: [0, PAGE_HEIGHT], height: HEADER_HEIGHT, width: COLUMN_WIDTH, align: :center, valign: :center, style: :bold
   end
 
   def draw_day_column_labels
-    # TODO: SRPV. This is template/render code
-    day_labels = (0...DAYS_PER_WEEK).map {|d| (date + d).strftime "%a   %-m/%-d" }
+
+    day_labels = planner.week.days.map {|day| day.strftime "%a   %-m/%-d" }
 
     day_labels.map.with_index {|label, i| [label, (TODO_COLUMNS+i)*COLUMN_WIDTH]}.each do |label, x|
-      pdf.text_box label, at: [x,PAGE_HEIGHT], height: HEADER_HEIGHT, width: COLUMN_WIDTH, align: :center, valign: :center, style: :bold
+      prawn.text_box label, at: [x,PAGE_HEIGHT], height: HEADER_HEIGHT, width: COLUMN_WIDTH, align: :center, valign: :center, style: :bold
     end
   end
 
@@ -208,11 +226,11 @@ class PlannerTemplate
     with_thin_pen do
       with_light_pen do
         (0..PAGE_WIDTH).step(GRAPH_CELL_WIDTH) do |x|
-          pdf.stroke_line [x,0], [x,PAGE_HEIGHT]
+          prawn.stroke_line [x,0], [x,PAGE_HEIGHT]
         end
 
         (0..PAGE_HEIGHT).step(GRAPH_CELL_HEIGHT) do |y|
-          pdf.stroke_line [0,y], [PAGE_WIDTH,y]
+          prawn.stroke_line [0,y], [PAGE_WIDTH,y]
         end
       end
     end
@@ -221,11 +239,11 @@ class PlannerTemplate
   def draw_octant_outlines
     with_thick_pen do
       (0..PAGE_WIDTH).step(PAGE_WIDTH/GRAPH_MAJOR_COLUMNS).each do |x|
-        pdf.stroke_line [x,0], [x,PAGE_HEIGHT]
+        prawn.stroke_line [x,0], [x,PAGE_HEIGHT]
       end
 
       (0..PAGE_HEIGHT).step(PAGE_HEIGHT/GRAPH_MAJOR_ROWS).each do |y|
-        pdf.stroke_line [0,y], [PAGE_WIDTH,y]
+        prawn.stroke_line [0,y], [PAGE_WIDTH,y]
       end
     end
   end
