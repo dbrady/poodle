@@ -7,7 +7,7 @@ class PlannerTemplate
 
   private_attr_reader :prawn, :planner
 
-  def initialize(opts)
+  def initialize opts
     @planner = opts.fetch :planner
   end
 
@@ -29,13 +29,17 @@ class PlannerTemplate
   # the first date if the year does not change: "Mar 26-Apr 1,
   # 2012". Month will be omitted from the second date if it does not
   # change: "Mar 12-18, 2012".
-  def format_week(week)
+  def format_week week
     label = ""
     label += week.first.strftime "%b %-d"
     label += week.first.strftime ", %Y" if week.year_differs?
     label += DATE_RANGE_SEPARATOR
     label += week.last.strftime "%b " if week.month_differs?
     label += week.last.strftime "%-d, %Y"
+  end
+
+  def format_day date
+    date.strftime "%a   %-m/%-d"
   end
 
   private
@@ -206,7 +210,7 @@ class PlannerTemplate
 
   def draw_day_column_labels
 
-    day_labels = planner.week.days.map {|day| day.strftime "%a   %-m/%-d" }
+    day_labels = planner.week.days.map {|d| format_day d }
 
     day_labels.map.with_index {|label, i| [label, (TODO_COLUMNS+i)*COLUMN_WIDTH]}.each do |label, x|
       prawn.text_box label, at: [x,PAGE_HEIGHT], height: HEADER_HEIGHT, width: COLUMN_WIDTH, align: :center, valign: :center, style: :bold
