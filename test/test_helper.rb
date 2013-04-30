@@ -10,7 +10,7 @@ require 'debugger'
 # it here. Now we can change the planner without breaking the
 # test. (May still want to update the test template and checksum,
 # however.)
-MAGIC_MD5_CHECKSUM="d2e83a4ce3799ab181133c77b88fddf1"
+MAGIC_MD5_CHECKSUM="c209e87c8aed49097d4f45ce350ee16a"
 
 module StringMd5
   def md5
