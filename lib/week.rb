@@ -66,9 +66,7 @@ class Week
   private
 
   def calculate_beginning_of_week
-    delta = date.wday - week_starts_on
-    delta += 7 if delta < 0 # wrap around to previous week
-    date - delta
+    date - (date.wday - week_starts_on) % DAYS_PER_WEEK
   end
 
   def month_differs?
