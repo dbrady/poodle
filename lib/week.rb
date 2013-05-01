@@ -13,8 +13,6 @@ class Week
   # e.g. "Monday". Must be one of +Date::DAYNAMES+.
   attr_reader :week_starts_on
 
-  # [opts] Hash containing construction parameters
-  #
   # [:date]
   #     Date object. A calendar date anywhere in the week to be
   #     created
@@ -22,10 +20,13 @@ class Week
   #     Optional. English string naming the day of the week that the
   #     "work week" starts on. See Date::DAYNAMES for the complete
   #     list. Defaults to "Monday"
-  def initialize opts
-    @date = opts.fetch :date
-    @week_starts_on = Date::DAYNAMES.index opts.fetch :starts_on, "Monday"
+  def initialize(date: Date.today, starts_on: "Monday")
+    @date, @week_starts_on = date, day_index_for(starts_on)
     raise ArgumentError.new(":starts_on must be a weekday name, E.g. 'Monday', 'Tuesday'") unless week_starts_on
+  end
+
+  def day_index_for day_name
+    Date::DAYNAMES.index day_name
   end
 
   # returns Date of the first day of this week. E.g. if you choose the

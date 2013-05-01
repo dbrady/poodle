@@ -8,4 +8,4 @@ opts = Trollop.options do
   opt :filename, "Output filename", type: :string, default: 'planner_sheet.pdf'
 end
 
-PlannerApplication.create class: Planner, date: opts[:date], filename: opts[:filename]
+PlannerApplication.create klass: Planner, date: opts[:date], filename: opts[:filename]

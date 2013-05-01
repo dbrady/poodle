@@ -32,5 +32,4 @@ class TestDrawPlanner < MiniTest::Unit::TestCase
   def test_draw_planner
     assert_equal MAGIC_MD5_CHECKSUM, planner_md5
   end
-
 end

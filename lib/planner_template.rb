@@ -1,5 +1,6 @@
 require "prawn"
 require File.expand_path(File.join(File.dirname(__FILE__), 'prawn_wrapper'))
+require File.expand_path(File.join(File.dirname(__FILE__), 'required_keyword_args'))
 
 class PlannerTemplate
   # Text string to separate beginning and end dates in date range
@@ -7,8 +8,8 @@ class PlannerTemplate
 
   private_attr_reader :prawn, :planner
 
-  def initialize opts
-    @planner = opts.fetch :planner
+  def initialize(planner: required('planner'))
+    @planner = planner
   end
 
   def write_to file
@@ -161,8 +162,8 @@ class PlannerTemplate
     BODY_LEFT + i * COLUMN_WIDTH
   end
 
-  def column_x_positions(opts={})
-    columns = opts[:include_right_edge] ? COLUMNS+1 : COLUMNS
+  def column_x_positions(include_right_edge: false)
+    columns = include_right_edge ? COLUMNS+1 : COLUMNS
     (0...columns).map {|i| column_x_position i }
   end
 

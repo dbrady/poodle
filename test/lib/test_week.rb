@@ -3,9 +3,9 @@ require File.expand_path(File.join(File.dirname(__FILE__), '../test_helper'))
 require File.expand_path(File.join(File.dirname(__FILE__), '../../lib/week'))
 
 class TestWeek < MiniTest::Unit::TestCase
-  def assert_rewinds opts
-    from = Date.parse opts[:from]
-    to = Date.parse opts[:to]
+  def assert_rewinds(from: "2013-04-14", to: "2013-04-08")
+    from = Date.parse from
+    to = Date.parse to
 
     week = Week.new date: from, starts_on: @start_week_on
     week.first.must_equal to
@@ -41,9 +41,9 @@ class TestWeek < MiniTest::Unit::TestCase
     end
   end
 
-  def self.make_test_methods_for_week opts
-    opts[:days].each do |from, to|
-      make_test_method_for_week_and_date opts[:starting_on], from, to
+  def self.make_test_methods_for_week(days: [], starting_on: nil)
+    days.each do |from, to|
+      make_test_method_for_week_and_date starting_on, from, to
     end
   end
 

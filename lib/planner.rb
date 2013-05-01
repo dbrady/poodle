@@ -7,8 +7,8 @@ class Planner
 
   attr_reader :week
 
-  def initialize opts
-    @week = Week.new(date: opts.fetch(:date))
+  def initialize(date: Date.today)
+    @week = Week.new date: date
     @template = PlannerTemplate.new planner: self
   end
 

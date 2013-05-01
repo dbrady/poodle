@@ -18,7 +18,7 @@ class TestPlannerApplication < MiniTest::Unit::TestCase
     mock_class.expect :new, mock_planner, [{date: @date}]
     mock_planner.expect :generate_into, nil, [@buffer]
 
-    PlannerApplication.create class: mock_class, date: @date_string, buffer: @buffer
+    PlannerApplication.create klass: mock_class, date: @date_string, buffer: @buffer
     assert mock_class.verify
     assert mock_planner.verify
   end
