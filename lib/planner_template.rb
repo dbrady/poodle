@@ -212,15 +212,29 @@ class PlannerTemplate
     end
   end
 
+  def columns_with_time_labels
+    [1,4]
+  end
+
+  def time_label_x_positions
+    columns_with_time_labels.map {|column| BODY_LEFT + column * COLUMN_WIDTH }
+  end
+
+  def hours_to_label
+    (START_HOUR..END_HOUR)
+  end
+
+  def hour_label_y_position hour
+    BODY_HEIGHT + TIME_SLOT_HEIGHT - hour * HOUR_HEIGHT
+  end
+
+  def hour_labels_with_y_positions
+    hours_to_label.map {|hour| [hour, hour_label_y_position(hour)]}
+  end
+
   def draw_hour_labels
-    (START_HOUR..END_HOUR).each do |hour|
-      # This is kinda nasty and implicit, but I think I'll leave it
-      # for another day to clean up. What we do is decide that each
-      # pair of time slots is an hour, and we start right at the top
-      # of the planner. But we don't SHOW times until START_HOUR, and
-      # we stop showing them after END_HOUR.
-      y = BODY_HEIGHT + TIME_SLOT_HEIGHT - hour * HOUR_HEIGHT
-      [1,4].map {|column| BODY_LEFT + column * COLUMN_WIDTH }.each do |x|
+    hour_labels_with_y_positions.each do |hour, y|
+      time_label_x_positions.each do |x|
         label = (hour%12).to_s
         label = "12" if label == "0"
         prawn.bounding_box [x,y], width: CHECK_COLUMN_WIDTH, height: HOUR_HEIGHT do
