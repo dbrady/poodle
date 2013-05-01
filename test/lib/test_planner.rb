@@ -1,8 +1,8 @@
 require 'minitest/autorun'
-require File.expand_path(File.join(File.dirname(__FILE__), '../test_helper'))
+require File.expand_path(File.join(__dir__, '../test_helper'))
 require 'date'
 require 'stringio'
-require File.expand_path(File.join(File.dirname(__FILE__), '../../lib/planner'))
+require File.expand_path(File.join(__dir__, '../../lib/planner'))
 
 class TestPlanner < MiniTest::Unit::TestCase
   def setup

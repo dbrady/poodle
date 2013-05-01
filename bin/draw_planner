@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require 'date'
 require 'trollop'
-require File.expand_path(File.join(File.dirname(__FILE__), '../lib/planner_application'))
+require File.expand_path(File.join(__dir__, '../lib/planner_application'))
 
 opts = Trollop.options do
   opt :date, "Date this planner should include (planner will start on the Monday of the week that includes that date)", type: :string, default: Date.today.strftime("%F")
