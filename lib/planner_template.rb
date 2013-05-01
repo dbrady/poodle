@@ -142,10 +142,14 @@ class PlannerTemplate
     end
   end
 
+  def time_slot_y_positions
+    (PAGE_BOTTOM..BODY_HEIGHT).step(TIME_SLOT_HEIGHT)
+  end
+
   def draw_time_slots
     with_thin_pen do
       with_light_pen do
-        (PAGE_BOTTOM..BODY_HEIGHT).step(TIME_SLOT_HEIGHT) do |y|
+         time_slot_y_positions.each do |y|
           # TODO: Can we skip the tick boxes with times in them?
           # I mean, duhhhh, YES we can. But... easily? Not
           # really. It's a pain how we lay in the time labels right
@@ -247,14 +251,22 @@ class PlannerTemplate
     end
   end
 
+  def graph_x_positions
+    (BODY_LEFT..BODY_RIGHT).step(GRAPH_CELL_WIDTH)
+  end
+
+  def graph_y_positions
+    (BODY_BOTTOM..PAGE_TOP+PDF_GUTTER_OVERLAP_Y).step(GRAPH_CELL_HEIGHT)
+  end
+
   def draw_graph_paper
     with_thin_pen do
       with_light_pen do
-        (BODY_LEFT..BODY_RIGHT).step(GRAPH_CELL_WIDTH) do |x|
+        graph_x_positions.each do |x|
           prawn.stroke_line [x,BODY_BOTTOM], [x,PAGE_TOP+PDF_GUTTER_OVERLAP_Y-3] # 6 is a fudge factor; need to clean this up a bit
         end
 
-        (BODY_BOTTOM..PAGE_TOP+PDF_GUTTER_OVERLAP_Y).step(GRAPH_CELL_HEIGHT) do |y|
+        graph_y_positions.each do |y|
           prawn.stroke_line [BODY_LEFT,y], [BODY_RIGHT-6,y] # 3 is a fudge factor; need to clean this up a bit
         end
       end
