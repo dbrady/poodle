@@ -228,15 +228,19 @@ class PlannerTemplate
     BODY_HEIGHT + TIME_SLOT_HEIGHT - hour * HOUR_HEIGHT
   end
 
+  def hour_label hour
+    label = (hour%12).to_s
+    label = "12" if label == "0"
+    label
+  end
+
   def hour_labels_with_y_positions
-    hours_to_label.map {|hour| [hour, hour_label_y_position(hour)]}
+    hours_to_label.map {|hour| [hour_label(hour), hour_label_y_position(hour)]}
   end
 
   def draw_hour_labels
-    hour_labels_with_y_positions.each do |hour, y|
+    hour_labels_with_y_positions.each do |label, y|
       time_label_x_positions.each do |x|
-        label = (hour%12).to_s
-        label = "12" if label == "0"
         prawn.bounding_box [x,y], width: CHECK_COLUMN_WIDTH, height: HOUR_HEIGHT do
           prawn.text_box label, width: CHECK_COLUMN_WIDTH, height: HOUR_HEIGHT, align: :right, valign: :center
         end
