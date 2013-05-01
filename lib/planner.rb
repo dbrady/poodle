@@ -1,5 +1,6 @@
 require_relative 'week'
-require 'scoped_attr_accessor/include'
+require 'scoped_attr_accessor/refined'
+using ScopedAttrAccessors
 require_relative 'planner_template'
 
 class Planner

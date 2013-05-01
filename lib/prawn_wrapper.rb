@@ -1,5 +1,7 @@
 require 'prawn'
 require 'forwardable'
+require 'scoped_attr_accessor/refined'
+using ScopedAttrAccessors
 
 class PrawnWrapper
   extend Forwardable

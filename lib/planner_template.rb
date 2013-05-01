@@ -1,6 +1,8 @@
 require "prawn"
 require_relative 'prawn_wrapper'
 require_relative 'required_keyword_args'
+require 'scoped_attr_accessor/refined'
+using ScopedAttrAccessors
 
 class PlannerTemplate
   # Text string to separate beginning and end dates in date range
