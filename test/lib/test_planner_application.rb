@@ -1,8 +1,8 @@
 require 'minitest/autorun'
-require File.expand_path(File.join(__dir__, '../test_helper'))
+require_relative '../test_helper'
 require 'date' # needed in Ruby 1.8 for Date.today && Date.parse; remove in Ruby 2.0
 require 'stringio'
-require File.expand_path(File.join(__dir__, '../../lib/planner_application'))
+require_relative '../../lib/planner_application'
 
 class TestPlannerApplication < MiniTest::Unit::TestCase
   def setup

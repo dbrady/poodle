@@ -1,6 +1,6 @@
 require 'minitest/autorun'
-require File.expand_path(File.join(__dir__, '../test_helper'))
-require File.expand_path(File.join(__dir__, '../../lib/planner_template'))
+require_relative '../test_helper'
+require_relative '../../lib/planner_template'
 
 class TestWeek < MiniTest::Unit::TestCase
   def setup

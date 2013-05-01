@@ -1,6 +1,6 @@
 require "prawn"
-require File.expand_path(File.join(__dir__, 'prawn_wrapper'))
-require File.expand_path(File.join(__dir__, 'required_keyword_args'))
+require_relative 'prawn_wrapper'
+require_relative 'required_keyword_args'
 
 class PlannerTemplate
   # Text string to separate beginning and end dates in date range

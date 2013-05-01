@@ -1,5 +1,5 @@
 require 'minitest/autorun'
-require File.expand_path(File.join(__dir__, '../test_helper.rb'))
+require_relative '../test_helper.rb'
 
 class TestDrawPlanner < MiniTest::Unit::TestCase
   def setup

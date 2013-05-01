@@ -1,6 +1,6 @@
 require "date" # needed in Ruby 1.8 for Date.today && Date.parse; remove in Ruby 2.0
-require File.expand_path(File.join(__dir__, "planner"))
-require File.expand_path(File.join(__dir__, "required_keyword_args"))
+require_relative "planner"
+require_relative "required_keyword_args"
 
 class PlannerApplication
   def self.create(klass: Planner, date: Date.today.strftime('%F'), buffer: nil, filename: "planner_sheet.pdf")
