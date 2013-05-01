@@ -229,9 +229,7 @@ class PlannerTemplate
   end
 
   def hour_label hour
-    label = (hour%12).to_s
-    label = "12" if label == "0"
-    label
+    (hour > 12 ? hour - 12 : hour).to_s
   end
 
   def hour_labels_with_y_positions
