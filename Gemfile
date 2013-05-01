@@ -12,11 +12,6 @@ group :development do
   gem "guard-minitest", "~>0.5"
   gem "growl", "~>1.0"
 
-  if RUBY_VERSION < '2.0.0'
-    gem "minitest", "~>4.0"
-    gem "rake", "~>10.0"
-  end
-
   # ----------------------------------------------------------------------
   # Guard File System listeners
   #
