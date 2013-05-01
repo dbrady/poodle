@@ -1,6 +1,5 @@
 require 'minitest/autorun'
 require_relative '../test_helper'
-require 'date' # needed in Ruby 1.8 for Date.today && Date.parse; remove in Ruby 2.0
 require 'stringio'
 require_relative '../../lib/planner_application'
 

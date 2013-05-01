@@ -1,4 +1,3 @@
-require "date" # needed in Ruby 1.8 for Date.today && Date.parse; remove in Ruby 2.0
 require_relative "planner"
 require_relative "required_keyword_args"
 

@@ -1,6 +1,5 @@
 require 'minitest/autorun'
 require_relative '../test_helper'
-require 'date'
 require 'stringio'
 require_relative '../../lib/planner'
 

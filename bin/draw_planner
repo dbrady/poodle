@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-require 'date'
 require 'trollop'
 require_relative '../lib/planner_application'
 
