@@ -162,13 +162,13 @@ class PlannerTemplate
     BODY_LEFT + i * COLUMN_WIDTH
   end
 
-  def column_x_positions
-    (0..Float::INFINITY).lazy.map {|i| column_x_position i }
+  def column_x_positions(columns: COLUMNS)
+    (0..Float::INFINITY).lazy.map {|i| column_x_position i }.first columns
   end
 
   def draw_columns
     with_thick_pen do
-      column_x_positions.first(COLUMNS+1).each do |x|
+      column_x_positions(columns: COLUMNS+1).each do |x|
         prawn.stroke_line [x,0], [x,PAGE_HEIGHT]
       end
     end
@@ -176,7 +176,7 @@ class PlannerTemplate
 
   def draw_checkoff_columns
     with_thin_pen do
-      column_x_positions.first(COLUMNS).each do |x|
+      column_x_positions.each do |x|
         prawn.stroke_line [x+CHECK_COLUMN_WIDTH,0], [x+CHECK_COLUMN_WIDTH,BODY_HEIGHT]
       end
     end
