@@ -1,3 +1,5 @@
+require 'date'
+
 class Week
   # Constant to prevent the magic number 7 appearing in the
   # code. Added to reveal intent more than to protect against the

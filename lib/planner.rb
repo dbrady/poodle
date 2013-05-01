@@ -1,6 +1,7 @@
 require_relative 'week'
 require 'scoped_attr_accessor/include'
 require_relative 'planner_template'
+require 'date'
 
 class Planner
   private_attr_reader :template
