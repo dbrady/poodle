@@ -2,7 +2,6 @@ source "http://rubygems.org"
 
 gem "rake", "~>10.0"
 gem "prawn", "~>0.12"
-gem "trollop", "~>2.0"
 gem "scoped_attr_accessor", "~>1.0"
 
 group :development do

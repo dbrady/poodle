@@ -1,10 +1,26 @@
 #!/usr/bin/env ruby
-require 'trollop'
+require 'optparse'
 require_relative '../lib/planner_application'
+require 'date'
 
-opts = Trollop.options do
-  opt :date, "Date this planner should include (planner will start on the Monday of the week that includes that date)", type: :string, default: Date.today.strftime("%F")
-  opt :filename, "Output filename", type: :string, default: 'planner_sheet.pdf'
-end
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: #{$0} [options]"
 
-PlannerApplication.create klass: Planner, date: opts[:date], filename: opts[:filename]
+  options[:date] = Date.today.iso8601
+  opts.on("-d", "--date [YYYY-mm-dd]", "Date the planner should include (default: today (#{options[:date]}))") do |date|
+    options[:date] = date
+  end
+
+  options[:filename] = "planner_sheet.pdf"
+  opts.on("-f", "--filename [FILENAME]", "Output filename (default: planner_sheet.pdf)") do |filename|
+    options[:filename] = filename
+  end
+
+  opts.on_tail("-h", "--help", "Show this message") do
+    puts opts
+    exit
+  end
+end.parse!
+
+PlannerApplication.create klass: Planner, date: options[:date], filename: options[:filename]
