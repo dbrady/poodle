@@ -25,7 +25,7 @@ class TestDrawPlanner < MiniTest::Unit::TestCase
     planner_contents.md5
   end
 
-  def after
+  def teardown
     execute_delete_planner
   end
 
