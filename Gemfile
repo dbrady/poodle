@@ -5,7 +5,7 @@ gem "prawn", "~> 0.12"
 gem "scoped_attr_accessor", "~> 1.0"
 
 group :development do
-  gem "debugger", "~> 1.5"
+  gem "debugger", "~> 1.6.1"
   gem "flay", "~> 2.2"
   gem "guard", "~> 1.0"
   gem "guard-minitest", "~> 0.5"
