@@ -72,10 +72,11 @@ class PlannerTemplate
   BODY_RIGHT=PAGE_WIDTH+PDF_GUTTER_OVERLAP_X
   ROWS=BODY_HEIGHT/TIME_SLOT_HEIGHT
 
-  # Title label position
+  # Title label position - this is the date box e.g. Sep 22-29, 2024
   TITLE_LABEL_WIDTH=150.0
   TITLE_LABEL_HEIGHT=18.0
-  TITLE_X=BODY_RIGHT-TITLE_LABEL_WIDTH
+  TITLE_RIGHT_MARGIN=45.0 # Nudge the title to the left a bit so the 3-ring punch pokes out the year, not the days (filing convenience)
+  TITLE_X=BODY_RIGHT-(TITLE_LABEL_WIDTH + TITLE_RIGHT_MARGIN)
   TITLE_Y=PAGE_HEIGHT+TITLE_LABEL_HEIGHT+4.0
 
   # Total number of columns=8, but one is for TODO's
