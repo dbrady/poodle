@@ -14,6 +14,7 @@ class TestWeek < MiniTest::Unit::TestCase
   def self.mday_to_iso_string mday
     '2013-04-%02d' % mday
   end
+
   def mday_to_iso_string mday
     self.class.mday_to_iso_string mday
   end
@@ -21,10 +22,10 @@ class TestWeek < MiniTest::Unit::TestCase
   def self.mday_to_date mday
     Date.parse mday_to_iso_string mday
   end
+
   def mday_to_date mday
     self.class.mday_to_date mday
   end
-
 
   def self.make_test_method_name week_starts_on, from, to
     sprintf "test_beginning_of_week_when_week_starts_on_a_%s_the_week_of_%s_201304%02d_rewinds_to_201304%02d",
@@ -35,7 +36,7 @@ class TestWeek < MiniTest::Unit::TestCase
   end
 
   def self.make_test_method_for_week_and_date week_starting_on, from, to
-    define_method(make_test_method_name week_starting_on, from, to) do
+    define_method(make_test_method_name(week_starting_on, from, to)) do
       @start_week_on = week_starting_on
       assert_rewinds from: mday_to_iso_string(from), to: mday_to_iso_string(to)
     end
@@ -85,17 +86,20 @@ class TestWeek < MiniTest::Unit::TestCase
   # on this day | And we pick a week on this day in April 2013, when does THAT week begin?
   # ------------+---------------------------------------------------------------------|
   # Weekday     | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 |
+
+  # rubocop:disable Layout/ExtraSpacing
   [
-   ["Monday",      8,  15,  15,  15,  15,  15,  15,  15,  22,  22,  22,  22,  22,  22 ],
-   ["Tuesday",     9,   9,  16,  16,  16,  16,  16,  16,  16,  23,  23,  23,  23,  23 ],
-   ["Wednesday",  10,  10,  10,  17,  17,  17,  17,  17,  17,  17,  24,  24,  24,  24 ],
-   ["Thursday",   11,  11,  11,  11,  18,  18,  18,  18,  18,  18,  18,  25,  25,  25 ],
-   ["Friday",     12,  12,  12,  12,  12,  19,  19,  19,  19,  19,  19,  19,  26,  26 ],
-   ["Saturday",   13,  13,  13,  13,  13,  13,  20,  20,  20,  20,  20,  20,  20,  27 ],
-   ["Sunday",     14,  14,  14,  14,  14,  14,  14,  21,  21,  21,  21,  21,  21,  21 ]
+    ["Monday",      8,  15,  15,  15,  15,  15,  15,  15,  22,  22,  22,  22,  22,  22],
+    ["Tuesday",     9,   9,  16,  16,  16,  16,  16,  16,  16,  23,  23,  23,  23,  23],
+    ["Wednesday",  10,  10,  10,  17,  17,  17,  17,  17,  17,  17,  24,  24,  24,  24],
+    ["Thursday",   11,  11,  11,  11,  18,  18,  18,  18,  18,  18,  18,  25,  25,  25],
+    ["Friday",     12,  12,  12,  12,  12,  19,  19,  19,  19,  19,  19,  19,  26,  26],
+    ["Saturday",   13,  13,  13,  13,  13,  13,  20,  20,  20,  20,  20,  20,  20,  27],
+    ["Sunday",     14,  14,  14,  14,  14,  14,  14,  21,  21,  21,  21,  21,  21,  21]
   ].each do |start_day, *days|
     make_test_methods_for_week starting_on: start_day, days: (14..27).to_a.zip(days)
   end
+  # rubocop:enable Layout/ExtraSpacing
 
   def test_days_returns_mappable
     Week.new(date: Date.parse("2013-04-29")).days.map {|day| day.mday }.must_equal [29, 30, 1, 2, 3, 4, 5]

@@ -45,57 +45,59 @@ class PlannerTemplate
 
   private
 
-  # Prawn-specific page layout units
-  PDF_GUTTER_OVERLAP_X=30.0
-  PDF_GUTTER_OVERLAP_Y=30.0
-  PAGE_WIDTH=720.0
-  PAGE_HEIGHT=540.0
-  PAGE_LEFT=0.0
-  PAGE_TOP=540.0
-  PAGE_BOTTOM=0.0
-  TIME_SLOT_HEIGHT=9.0
-  HEADER_HEIGHT=18.0
-  CHECK_COLUMN_WIDTH=9.0
+  # Prawn-specific page layout units. Prawn uses pt (72 per inch)
+  PDF_GUTTER_OVERLAP_X = 30.0           # affects x gutters
+  PDF_GUTTER_OVERLAP_Y = 30.0
+  PAGE_WIDTH = 720.0 #  720.0
+  PAGE_HEIGHT = 540.0
+  PAGE_LEFT = 6.0
+  PAGE_TOP = 540.0
+  PAGE_BOTTOM = 0.0
+  TIME_SLOT_HEIGHT = 9.0
+  HEADER_HEIGHT = 18.0
+  CHECK_COLUMN_WIDTH = 9.0
 
   # Prawn-specific appearance characteristics
-  THICK_LINE_WIDTH=0.2
-  THIN_LINE_WIDTH=0.1
-  LIGHT_LINE_OPACITY=0.75
-  HOURLY_LABEL_FONT_SIZE=8.0
+  THICK_LINE_WIDTH = 0.2
+  THIN_LINE_WIDTH = 0.1
+  LIGHT_LINE_OPACITY = 0.75
+  HOURLY_LABEL_FONT_SIZE = 8.0
 
   # Some useful derived constants
-  BODY_TOP=PAGE_TOP-HEADER_HEIGHT
-  BODY_BOTTOM=PAGE_BOTTOM
-  BODY_LEFT=PAGE_LEFT-PDF_GUTTER_OVERLAP_X
-  BODY_HEIGHT=PAGE_HEIGHT-HEADER_HEIGHT
-  BODY_WIDTH=PAGE_WIDTH+PDF_GUTTER_OVERLAP_X*2
-  BODY_RIGHT=PAGE_WIDTH+PDF_GUTTER_OVERLAP_X
-  ROWS=BODY_HEIGHT/TIME_SLOT_HEIGHT
+  BODY_TOP = PAGE_TOP - HEADER_HEIGHT
+  BODY_BOTTOM = PAGE_BOTTOM
+  BODY_LEFT = PAGE_LEFT - PDF_GUTTER_OVERLAP_X
+  BODY_HEIGHT = PAGE_HEIGHT - HEADER_HEIGHT
+  BODY_WIDTH = PAGE_WIDTH + PDF_GUTTER_OVERLAP_X * 2
+  BODY_RIGHT = PAGE_WIDTH + PDF_GUTTER_OVERLAP_X
+  ROWS = BODY_HEIGHT / TIME_SLOT_HEIGHT
 
   # Title label position - this is the date box e.g. Sep 22-29, 2024
-  TITLE_LABEL_WIDTH=150.0
-  TITLE_LABEL_HEIGHT=18.0
-  TITLE_RIGHT_MARGIN=45.0 # Nudge the title to the left a bit so the 3-ring punch pokes out the year, not the days (filing convenience)
-  TITLE_X=BODY_RIGHT-(TITLE_LABEL_WIDTH + TITLE_RIGHT_MARGIN)
-  TITLE_Y=PAGE_HEIGHT+TITLE_LABEL_HEIGHT+4.0
+  TITLE_LABEL_WIDTH = 150.0
+  TITLE_LABEL_HEIGHT = 18.0
+  # This was good on my HP laserjet. Totes wrong for my ET-2800
+  # TITLE_RIGHT_MARGIN = 45.0 # Nudge the title to the left a bit so the 3-ring punch pokes out the year, not the days (filing convenience)
+  TITLE_RIGHT_MARGIN = 0.0
+  TITLE_X = BODY_RIGHT - (TITLE_LABEL_WIDTH + TITLE_RIGHT_MARGIN)
+  TITLE_Y = PAGE_HEIGHT + TITLE_LABEL_HEIGHT + 4.0
 
   # Total number of columns=8, but one is for TODO's
-  DAYS_PER_WEEK=7
-  TODO_COLUMNS=1
+  DAYS_PER_WEEK = 7
+  TODO_COLUMNS = 1
   # This is it--the number of columns on the front side of the planner
-  COLUMNS=TODO_COLUMNS+DAYS_PER_WEEK
-  COLUMN_WIDTH=BODY_WIDTH/COLUMNS
+  COLUMNS = TODO_COLUMNS + DAYS_PER_WEEK
+  COLUMN_WIDTH = BODY_WIDTH / COLUMNS
 
   # Hour labels are marked on the planner
-  START_HOUR=8
-  END_HOUR=20
+  START_HOUR = 8
+  END_HOUR = 20
 
   # Right now time slots are 30 minutes
-  HOUR_HEIGHT=TIME_SLOT_HEIGHT*2
+  HOUR_HEIGHT = TIME_SLOT_HEIGHT*2
 
   # The back page has 4x2 large sections, each filled with graph paper
-  GRAPH_CELL_HEIGHT=9.0
-  GRAPH_CELL_WIDTH=9.0
+  GRAPH_CELL_HEIGHT = 9.0
+  GRAPH_CELL_WIDTH = 9.0
 
   def generate_front_page
     draw_planner_skeleton
@@ -108,6 +110,7 @@ class PlannerTemplate
 
   def with_prawn_setting setting, value, &block
     old_value = prawn.send setting
+    puts "Setting #{setting}, was #{old_value.inspect}, now #{value.inspect}"
     prawn.send "#{setting}=", value
     yield
     prawn.send "#{setting}=", old_value
@@ -143,22 +146,28 @@ class PlannerTemplate
     end
   end
 
+  def with_light_blue_pen &block
+    with_light_pen do
+      with_prawn_setting(:stroke_color, "c0c0ff") do
+        yield
+      end
+    end
+  end
+
   def time_slot_y_positions
     (PAGE_BOTTOM..BODY_HEIGHT).step(TIME_SLOT_HEIGHT)
   end
 
   def draw_time_slots
-    with_thin_pen do
-      with_light_pen do
-         time_slot_y_positions.each do |y|
-          # TODO: Can we skip the tick boxes with times in them?
-          # I mean, duhhhh, YES we can. But... easily? Not
-          # really. It's a pain how we lay in the time labels right
-          # now. Need to refactor this code until we're drawing cells
-          # instead of drawing lines across the whole page. Then it
-          # becomes easy. I'll leave that one for later.
-          prawn.stroke_line [BODY_LEFT,y], [BODY_RIGHT,y]
-        end
+    with_light_blue_pen do
+      time_slot_y_positions.each do |y|
+        # TODO: Can we skip the tick boxes with times in them?
+        # I mean, duhhhh, YES we can. But... easily? Not
+        # really. It's a pain how we lay in the time labels right
+        # now. Need to refactor this code until we're drawing cells
+        # instead of drawing lines across the whole page. Then it
+        # becomes easy. I'll leave that one for later.
+        prawn.stroke_line [BODY_LEFT, y], [BODY_RIGHT, y]
       end
     end
   end
@@ -173,8 +182,8 @@ class PlannerTemplate
 
   def draw_columns
     with_thick_pen do
-      column_x_positions(columns: COLUMNS+1).each do |x|
-        prawn.stroke_line [x,0], [x,PAGE_HEIGHT]
+      column_x_positions(columns: COLUMNS + 1).each do |x|
+        prawn.stroke_line [x, 0], [x, PAGE_HEIGHT]
       end
     end
   end
@@ -182,15 +191,15 @@ class PlannerTemplate
   def draw_checkoff_columns
     with_thin_pen do
       column_x_positions.each do |x|
-        prawn.stroke_line [x+CHECK_COLUMN_WIDTH,0], [x+CHECK_COLUMN_WIDTH,BODY_HEIGHT]
+        prawn.stroke_line [x + CHECK_COLUMN_WIDTH, 0], [x + CHECK_COLUMN_WIDTH, BODY_HEIGHT]
       end
     end
   end
 
   def draw_lines_around_header_and_bottom
     with_thick_pen do
-      [0,BODY_HEIGHT,PAGE_HEIGHT].each do |y|
-        prawn.stroke_line [BODY_LEFT,y], [BODY_RIGHT,y]
+      [0, BODY_HEIGHT, PAGE_HEIGHT].each do |y|
+        prawn.stroke_line [BODY_LEFT, y], [BODY_RIGHT, y]
       end
     end
   end
@@ -214,7 +223,7 @@ class PlannerTemplate
   end
 
   def columns_with_time_labels
-    [1,4]
+    [1, 4]
   end
 
   def time_label_x_positions
@@ -240,7 +249,7 @@ class PlannerTemplate
   def draw_hour_labels
     hour_labels_with_y_positions.each do |label, y|
       time_label_x_positions.each do |x|
-        prawn.bounding_box [x,y], width: CHECK_COLUMN_WIDTH, height: HOUR_HEIGHT do
+        prawn.bounding_box [x, y], width: CHECK_COLUMN_WIDTH, height: HOUR_HEIGHT do
           prawn.text_box label, width: CHECK_COLUMN_WIDTH, height: HOUR_HEIGHT, align: :right, valign: :center
         end
       end
@@ -254,8 +263,8 @@ class PlannerTemplate
   def draw_day_column_labels
     day_labels = planner.week.days.map {|d| format_day d }
 
-    day_labels.map.with_index {|label, i| [label, BODY_LEFT + (TODO_COLUMNS+i)*COLUMN_WIDTH]}.each do |label, x|
-      prawn.text_box label, at: [x,PAGE_TOP], height: HEADER_HEIGHT, width: COLUMN_WIDTH, align: :center, valign: :center, style: :bold
+    day_labels.map.with_index {|label, i| [label, BODY_LEFT + (TODO_COLUMNS + i) * COLUMN_WIDTH]}.each do |label, x|
+      prawn.text_box label, at: [x, PAGE_TOP], height: HEADER_HEIGHT, width: COLUMN_WIDTH, align: :center, valign: :center, style: :bold
     end
   end
 
@@ -273,19 +282,17 @@ class PlannerTemplate
   end
 
   def graph_y_positions
-    (BODY_BOTTOM..PAGE_TOP+PDF_GUTTER_OVERLAP_Y).step(GRAPH_CELL_HEIGHT)
+    (BODY_BOTTOM..PAGE_TOP + PDF_GUTTER_OVERLAP_Y).step(GRAPH_CELL_HEIGHT)
   end
 
   def draw_graph_paper
-    with_thin_pen do
-      with_light_pen do
-        graph_x_positions.each do |x|
-          prawn.stroke_line [x,BODY_BOTTOM], [x,PAGE_TOP+PDF_GUTTER_OVERLAP_Y-3] # 6 is a fudge factor; need to clean this up a bit
-        end
+    with_light_blue_pen do
+      graph_x_positions.each do |x|
+        prawn.stroke_line [x, BODY_BOTTOM], [x, PAGE_TOP + PDF_GUTTER_OVERLAP_Y - 3] # 3 is a fudge factor; need to clean this up a bit
+      end
 
-        graph_y_positions.each do |y|
-          prawn.stroke_line [BODY_LEFT,y], [BODY_RIGHT-6,y] # 3 is a fudge factor; need to clean this up a bit
-        end
+      graph_y_positions.each do |y|
+        prawn.stroke_line [BODY_LEFT, y], [BODY_RIGHT - 6, y] # 6 is a fudge factor; need to clean this up a bit
       end
     end
   end

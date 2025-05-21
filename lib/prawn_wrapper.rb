@@ -5,17 +5,24 @@ class PrawnWrapper
   extend Forwardable
   private_attr_reader :prawn
 
-  def_delegators :@prawn,
-                 :start_new_page,
-                 :render,
+  def_delegators(:@prawn,
+                 :bounding_box,
+                 :fill_color,
+                 :fill_color=,
                  :font_size,
                  :font_size=,
                  :line_width,
                  :line_width=,
-                 :stroke_line,
-                 :bounding_box,
+                 :render,
+                 :start_new_page,
                  :stroke_bounds,
-                 :text_box
+                 :stroke_color,
+                 :stroke_color=,
+                 :text_box,
+                )
+
+  # stroke_line is now private and raises a warning
+  def stroke_line(...); @prawn.__send__(:stroke_line, ...); end
 
   def initialize
     @prawn = Prawn::Document.new page_layout: :landscape
