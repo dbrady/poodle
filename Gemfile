@@ -5,6 +5,10 @@ gem "prawn", "~> 0.12"
 gem "scoped_attr_accessor", "~> 1.0"
 
 group :development do
+  gem "rubocop", "~> 1.79"
+  gem "pry", "~> 0.15.2"
+  gem "byebug", "~> 12.0"
+  gem "pry-byebug", "~> 3.11"
   # gem "debugger", "~> 1.6.1"
   # gem "flay", "~> 2.2"
   # gem "guard", "~> 1.0"
