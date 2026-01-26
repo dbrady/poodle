@@ -1,2 +1,5 @@
-*.pdf
+1*.pdf
 .DS_Store
+/vendor/*
+poodle.code-workspace
+planner_sheet.pdf
