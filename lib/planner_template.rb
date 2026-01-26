@@ -60,6 +60,7 @@ class PlannerTemplate
   # Prawn-specific appearance characteristics
   THICK_LINE_WIDTH = 0.2
   THIN_LINE_WIDTH = 0.1
+  THINNER_LINE_WIDTH = 0.05
   LIGHT_LINE_OPACITY = 0.75
   HOURLY_LABEL_FONT_SIZE = 8.0
 
@@ -140,6 +141,12 @@ class PlannerTemplate
     end
   end
 
+  def with_thinner_pen &block
+    with_line_width(THINNER_LINE_WIDTH) do
+      yield
+    end
+  end
+
   def with_light_pen &block
     prawn.opacity LIGHT_LINE_OPACITY do
       yield
@@ -148,7 +155,9 @@ class PlannerTemplate
 
   def with_light_blue_pen &block
     with_light_pen do
-      with_prawn_setting(:stroke_color, "c0c0ff") do
+    # temp hack - try colorless
+      # with_prawn_setting(:stroke_color, "c0c0ff") do
+      with_prawn_setting(:stroke_color, "909090") do
         yield
       end
     end
@@ -159,15 +168,17 @@ class PlannerTemplate
   end
 
   def draw_time_slots
-    with_light_blue_pen do
-      time_slot_y_positions.each do |y|
-        # TODO: Can we skip the tick boxes with times in them?
-        # I mean, duhhhh, YES we can. But... easily? Not
-        # really. It's a pain how we lay in the time labels right
-        # now. Need to refactor this code until we're drawing cells
-        # instead of drawing lines across the whole page. Then it
-        # becomes easy. I'll leave that one for later.
-        prawn.stroke_line [BODY_LEFT, y], [BODY_RIGHT, y]
+    with_thinner_pen do
+      with_light_blue_pen do
+        time_slot_y_positions.each do |y|
+          # TODO: Can we skip the tick boxes with times in them?
+          # I mean, duhhhh, YES we can. But... easily? Not
+          # really. It's a pain how we lay in the time labels right
+          # now. Need to refactor this code until we're drawing cells
+          # instead of drawing lines across the whole page. Then it
+          # becomes easy. I'll leave that one for later.
+          prawn.stroke_line [BODY_LEFT, y], [BODY_RIGHT, y]
+        end
       end
     end
   end
@@ -286,13 +297,15 @@ class PlannerTemplate
   end
 
   def draw_graph_paper
-    with_light_blue_pen do
-      graph_x_positions.each do |x|
-        prawn.stroke_line [x, BODY_BOTTOM], [x, PAGE_TOP + PDF_GUTTER_OVERLAP_Y - 3] # 3 is a fudge factor; need to clean this up a bit
-      end
+    with_thinner_pen do
+      with_light_blue_pen do
+        graph_x_positions.each do |x|
+          prawn.stroke_line [x, BODY_BOTTOM], [x, PAGE_TOP + PDF_GUTTER_OVERLAP_Y - 3] # 3 is a fudge factor; need to clean this up a bit
+        end
 
-      graph_y_positions.each do |y|
-        prawn.stroke_line [BODY_LEFT, y], [BODY_RIGHT - 6, y] # 6 is a fudge factor; need to clean this up a bit
+        graph_y_positions.each do |y|
+          prawn.stroke_line [BODY_LEFT, y], [BODY_RIGHT - 6, y] # 6 is a fudge factor; need to clean this up a bit
+        end
       end
     end
   end
